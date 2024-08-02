@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity >=0.8.18;
 
+error noUserFoud(address addr);
+
 contract userContract {
     
     mapping (address => user) private users;
@@ -14,21 +16,23 @@ contract userContract {
 
     /* Events */
 
-    event userCreated (string memory _name, uint _age, role _userRole, address _userWalletAddress);
+    event userCreated (string _name, uint _age, role _userRole, address _userWalletAddress);
     event userDeleted (address userAddress);
-    event userUpdated (string memory _name, uint _age, role _userRole, address _userWalletAddress);
+    event userUpdated (string _name, uint _age, role _userRole, address _userWalletAddress);
 
 
     /* Modifiers */
 
     modifier onlyNewUser (address _userAddr){
-        require(users[_userAddr] == address(0), "User already exists!");
+        require(users[_userAddr].userWalletAddress == address(0), "User already exists!");
         _;
     }
 
     modifier ifUserExists (address _userAddr)
     {
-        require(users[_userAddr] != address(0), "User does not exist");
+        if(users[_userAddr].userWalletAddress == address(0)){
+            revert noUserFoud(_userAddr);
+        }
         _;
     }
 
@@ -36,7 +40,7 @@ contract userContract {
     struct user{
         string name;
         uint age;
-        string userRole;
+        role userRole;
         address userWalletAddress;
     }
 
@@ -45,11 +49,6 @@ contract userContract {
         users[_userWalletAddress] = user(_name, _age, _userRole, _userWalletAddress);
         emit userCreated(_name, _age, _userRole, _userWalletAddress);
 
-    }
-
-    function getUsers() public returns(user memory)
-    {
-        return users;
     }
 
     function getUserById(address _addr) public ifUserExists(_addr) returns(user memory)
