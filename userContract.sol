@@ -2,6 +2,7 @@
 pragma solidity >=0.8.18;
 
 error noUserFoud(address addr);
+error userAlreadyCreated(address addr);
 
 contract userContract {
     
@@ -24,7 +25,11 @@ contract userContract {
     /* Modifiers */
 
     modifier onlyNewUser (address _userAddr){
-        require(users[_userAddr].userWalletAddress == address(0), "User already exists!");
+        
+        if(users[_userAddr].userWalletAddress != address(0))
+        {
+            revert userAlreadyCreated(_userAddr);
+        }
         _;
     }
 
