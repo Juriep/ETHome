@@ -1,82 +1,66 @@
-// SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity >=0.8.18;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.18;
 
-error noUserFoud(address addr);
-error userAlreadyCreated(address addr);
+
+error UserNotFound(address userAddress);
+error UserFound(address userAddress);
 
 contract userContract {
     
-    mapping (address => user) private users;
+    mapping (address => User ) private users;
 
-    enum role{
-        landlords, tenants
-    }
-
-    role public userRoles;
-
-
-    /* Events */
-
-    event userCreated (string _name, uint _age, role _userRole, address _userWalletAddress);
-    event userDeleted (address userAddress);
-    event userUpdated (string _name, uint _age, role _userRole, address _userWalletAddress);
-
-
-    /* Modifiers */
-
-    modifier onlyNewUser (address _userAddr){
-        
-        if(users[_userAddr].userWalletAddress != address(0))
-        {
-            revert userAlreadyCreated(_userAddr);
-        }
-        _;
-    }
-
-    modifier ifUserExists (address _userAddr)
-    {
-        if(users[_userAddr].userWalletAddress == address(0)){
-            revert noUserFoud(_userAddr);
-        }
-        _;
-    }
-
-
-    struct user{
+    event NewUserAdded(address userAddress, string name, uint age);
+    event UserUpdated(address userAddress, string name, uint age);
+    event UserDeleted(address userAddress);
+    
+    struct User{
+        address userWalletAddress;
         string name;
         uint age;
-        role userRole;
-        address userWalletAddress;
     }
 
-    function addUser(string memory _name, uint _age, role _userRole, address _userWalletAddress) public onlyNewUser(_userWalletAddress){
-
-        users[_userWalletAddress] = user(_name, _age, _userRole, _userWalletAddress);
-        emit userCreated(_name, _age, _userRole, _userWalletAddress);
-
+    modifier checkIfUserExist(address userAddress) {
+        if(users[userAddress].userWalletAddress == address(0))
+            revert UserNotFound(userAddress);
+        _;
     }
 
-    function getUserById(address _addr) public ifUserExists(_addr) returns(user memory)
+    modifier onlyNewUser(address userAddress){
+        if(users[userAddress].userWalletAddress != address(0))
+            revert UserFound(userAddress);
+        _;
+    }
+
+    function addUser(string memory _name, uint _age) public onlyNewUser(msg.sender)
     {
-        return users[_addr];
+        require(bytes(_name).length > 0, "The name can not be empty!");
+        require(_age >= 18, "Current user does not meet the minimum age required!");
+
+        users[msg.sender] = User(msg.sender, _name, _age);
+        emit NewUserAdded(msg.sender, _name, _age);
     }
 
-    function updateUserById (string memory _name, uint _age, role _userRole, address _userWalletAddress) public ifUserExists(_userWalletAddress)
+    function getUser() public view checkIfUserExist(msg.sender) returns (User memory)
     {
-
-        users[_userWalletAddress].name = _name;
-        users[_userWalletAddress].age = _age;
-        users[_userWalletAddress].userRole = _userRole;
-        users[_userWalletAddress].userWalletAddress = _userWalletAddress;
-
-        emit userUpdated(_name, _age, _userRole, _userWalletAddress);
-
+        return users[msg.sender];
     }
 
-    function deleteUserById(address _addr) ifUserExists(_addr) public
+    function updateUser(string memory _name, uint _age) public checkIfUserExist(msg.sender)
     {
-        delete users[_addr];
-        emit userDeleted(_addr);
+
+        require(bytes(_name).length > 0, "The name can not be empty!");
+        require(_age >= 18, "Current user does not meet the minimum age required!");
+
+        users[msg.sender].name = _name;
+        users[msg.sender].age = _age;
+
+        emit UserUpdated(msg.sender, _name, _age);
+    }
+
+    function deleteUser() public checkIfUserExist(msg.sender)
+    {
+        delete users[msg.sender];
+        emit UserDeleted(msg.sender);
     }
 
 }
