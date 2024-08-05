@@ -71,6 +71,8 @@ contract apartmentContract {
         apartments[_newDirection].aptState = apartments[_oldDirection].aptState;
         apartments[_newDirection].apartmentOwner = apartments[_oldDirection].apartmentOwner;
 
+        delete apartments[_oldDirection];
+
         emit ApartmentDirectionChanged(_oldDirection, _newDirection);
     }
     
