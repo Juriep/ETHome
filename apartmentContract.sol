@@ -63,7 +63,7 @@ contract apartmentContract {
         emit ApartmentUpdated(_apartmentDirection,  _description, _ethPrice, _aptState, _apartmentOwner);
     }
 
-    function updateDirection(string memory _oldDirection, string memory _newDirection) public ifOldApartmentExist(_oldDirection){
+    function updateApartmentDirection(string memory _oldDirection, string memory _newDirection) public ifOldApartmentExist(_oldDirection){
         
         apartments[_newDirection].apartmentDirection = _newDirection;
         apartments[_newDirection].description = apartments[_oldDirection].description;
