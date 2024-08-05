@@ -1,62 +1,66 @@
-// SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity >0.8.18;
-
-error ownerAccess(address userToConnect);
-error noUserFound(address userNotFound);
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.8.18;
 
 contract apartmentContract {
     
-    address payable public apartmentOwner;
-    mapping (address => apartment) private apartmentsOwnedByUser;
+    enum ApartmentState{
+        Vacant, Occupied
+    }
 
+    // store apartments and find them by their city direction
+    mapping (string => Apartment) private apartments;
 
-    event newApartmentAdded(address _user, string  _country, string  _city, string  _cityAddress, uint _price, string  _description);
-    event apartmentsOwnedConsulted(address user);
-
-    struct apartment{
-        string country;
-        string city;
-        string cityAddress;
-        uint price;
+    event NewApartmentAdded(string _apartmentDirection, string _description, uint _ethPrice, ApartmentState _aptState ,address _apartmentOwner);
+    event ApartmentDeleted(string _apartmentDirection);
+    event ApartmentUpdated(string _apartmentDirection, string _description, uint _ethPrice, ApartmentState _aptState ,address _apartmentOwner);
+    
+    struct Apartment{
+        string apartmentDirection;
         string description;
-        address userAddress;
+        uint ethPrice;
+        ApartmentState aptState;
+        address apartmentOwner;
     }
-    
-    constructor() {
-        
-        apartmentOwner = payable(msg.sender);
+
+    modifier onlyNewApartment(string memory _apartmentDirection){
+
+        require( bytes(apartments[_apartmentDirection].apartmentDirection).length == 0, "Apartment already exists!");
+        _;
 
     }
 
-    modifier onlyOwner(address addr){
-        if(apartmentOwner != addr)
-        {
-            revert ownerAccess({ userToConnect: addr });
-        }
+    modifier ifApartmentExists(string memory _apartmentDirection) {
+        require( bytes(apartments[_apartmentDirection].apartmentDirection).length != 0, "Apartment does not exist!");
         _;
     }
 
-    modifier ifUserExists(address addr)
+
+    function addApartment(string memory _apartmentDirection, string memory _description, uint _ethPrice, ApartmentState _aptState ,address _apartmentOwner) public 
+        onlyNewApartment(_apartmentDirection)
     {
-        if(apartmentsOwnedByUser[addr].userAddress == address(0))
-        {
-            revert noUserFound({userNotFound: addr});
-        }
-        _;
+        apartments[_apartmentDirection] = Apartment(_apartmentDirection,  _description, _ethPrice, _aptState, _apartmentOwner);
+        emit NewApartmentAdded(_apartmentDirection,  _description, _ethPrice, _aptState, _apartmentOwner);
     }
 
-    function addApartment(string memory _country, string memory _city, string memory _cityAddress, uint _price, string memory _description) public
+    function getApartment(string memory _apartmentDirection) public view ifApartmentExists(_apartmentDirection) returns (Apartment memory)
     {
-        apartmentsOwnedByUser[msg.sender] = apartment(_country, _city, _cityAddress, _price, _description, msg.sender);
-        emit newApartmentAdded(msg.sender, _country, _city, _cityAddress, _price, _description);
-
+        return apartments[_apartmentDirection];
     }
 
-    function getUserApartmens(address _userAddress) public view ifUserExists(_userAddress) returns (apartment memory)
+    function updateApartmentParams(string memory _apartmentDirection, string memory _description, uint _ethPrice, ApartmentState _aptState,address _apartmentOwner) public ifApartmentExists(_apartmentDirection)
     {
-        return apartmentsOwnedByUser[_userAddress];
+        apartments[_apartmentDirection].description = _description;
+        apartments[_apartmentDirection].ethPrice = _ethPrice;
+        apartments[_apartmentDirection].aptState = _aptState;
+        apartments[_apartmentDirection].apartmentOwner = _apartmentOwner;
+
+        emit ApartmentUpdated(_apartmentDirection,  _description, _ethPrice, _aptState, _apartmentOwner);
     }
 
-    
+    function deleteApartment(string memory _apartmentDirection) ifApartmentExists(_apartmentDirection)
+    {
+        delete apartments[_apartmentDirection];
+        emit ApartmentDeleted(_apartmentDirection);
+    }
 
 }
