@@ -13,7 +13,8 @@ contract apartmentContract {
     event NewApartmentAdded(string _apartmentDirection, string _description, uint _ethPrice, ApartmentState _aptState ,address _apartmentOwner);
     event ApartmentDeleted(string _apartmentDirection);
     event ApartmentUpdated(string _apartmentDirection, string _description, uint _ethPrice, ApartmentState _aptState ,address _apartmentOwner);
-    
+    event ApartmentDirectionChanged(string _oldDirection, string _newDirection);
+
     struct Apartment{
         string apartmentDirection;
         string description;
@@ -30,6 +31,11 @@ contract apartmentContract {
     }
 
     modifier ifApartmentExists(string memory _apartmentDirection) {
+        require( bytes(apartments[_apartmentDirection].apartmentDirection).length != 0, "Apartment does not exist!");
+        _;
+    }
+
+    modifier ifOldApartmentExist(string memory _apartmentDirection){
         require( bytes(apartments[_apartmentDirection].apartmentDirection).length != 0, "Apartment does not exist!");
         _;
     }
@@ -57,6 +63,17 @@ contract apartmentContract {
         emit ApartmentUpdated(_apartmentDirection,  _description, _ethPrice, _aptState, _apartmentOwner);
     }
 
+    function updateDirection(string memory _oldDirection, string memory _newDirection) public ifOldApartmentExist(_oldDirection){
+        
+        apartments[_newDirection].apartmentDirection = _newDirection;
+        apartments[_newDirection].description = apartments[_oldDirection].description;
+        apartments[_newDirection].ethPrice = apartments[_oldDirection].ethPrice;
+        apartments[_newDirection].aptState = apartments[_oldDirection].aptState;
+        apartments[_newDirection].apartmentOwner = apartments[_oldDirection].apartmentOwner;
+
+        emit ApartmentDirectionChanged(_oldDirection, _newDirection);
+    }
+    
     function deleteApartment(string memory _apartmentDirection) ifApartmentExists(_apartmentDirection)
     {
         delete apartments[_apartmentDirection];
