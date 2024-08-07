@@ -10,6 +10,7 @@ contract ListOrRentOrSellApartment {
     apartmentContract private apartment;
 
     event apartmentOwnershipAdded(string _apartmentAddress, address _owner);
+    event apartmentBought(string _apartmentAddress, address newOwner);
 
     constructor(address _deployedUserContractAddess, address _deployedApartmentContractAddress) {
         user = userContract(_deployedUserContractAddess);
@@ -17,34 +18,55 @@ contract ListOrRentOrSellApartment {
     }
 
     modifier onlyIfApartmentIsVacant (string memory _apartmentAddress){
-        require(apartment.getApartmentState(_apartmentAddress) == apartment.ApartmentState.Vacant, "Sorry this apartment is not available at the moment!");
+        require(apartment.isApartmentVacant(_apartmentAddress) == true, "Sorry this apartment is not available at the moment!");
         _;
     }
 
     modifier onlyIfApartmentExists(string memory _apartmentAddress)
     {
-        require(bytes(apartment[_apartmentAddress]).length != 0, "The apartment is not created!");
+        require(apartment.searchIfApartmentExists(_apartmentAddress) == true, "The apartment is not created!");
         _;
     }
 
     modifier onlyIfUserExists(address _userWalletAddress)
     {
-        require(user.checkUserExistance() == true, "To perform this action u need to sign up first!");
+        require(user.checkUserExistance(msg.sender) == true, "To perform this action u need to sign up first!");
         _;
     }
 
-    function listAnApartment(string memory _apartmentAddress, string memory _description, uint _price, ApartmentState _aptState ,msg.sender) public onlyIfUserExists(msg.sender)
+    modifier onlyOwner(address _user, string memory _apartmentAddress)
     {
-        apartment.addApartment(_apartmentAddress,  _description, _price, _aptState, msg.sender);
+        require(apartment.getApartmentOwner(_apartmentAddress) == _user, "Sorry you do not have permissions to complete thhis task!");
+        _;
+    }
+
+    modifier ifPriceIsCorrect(string memory _apartmentAddress, uint _price)
+    {
+        require(apartment.getApartmentPrice(_apartmentAddress) == _price, "You do not have enogh Eth!");
+        _;
+    }
+
+    function listAnApartment(string memory _apartmentAddress, string memory _description, uint _price) public onlyIfUserExists(msg.sender)
+    {
+        apartment.addApartment(_apartmentAddress,  _description, _price,  msg.sender);
         emit apartmentOwnershipAdded(_apartmentAddress, msg.sender);
     }
 
-    function rentApartment(string memory _apartmentAddress) public onlyIfApartmentIsVacant(_apartmentAddress) onlyIfApartmentExists(_apartmentAddress)
+    function deleteApartment(string memory _apartmentAddress) public onlyOwner(msg.sender, _apartmentAddress)  {
+        apartment.deleteApartment(_apartmentAddress);
+    }
+
+    function BuyApartment(string memory _apartmentAddress) public payable onlyIfApartmentExists(_apartmentAddress)
+     onlyIfApartmentIsVacant(_apartmentAddress) ifPriceIsCorrect(_apartmentAddress, msg.value)
     {
         
+        address payable oldOwner = payable(apartment.getApartmentOwner(_apartmentAddress));
+        
+        oldOwner.transfer(msg.value);
 
+        apartment.changeAparmentOwner(_apartmentAddress, msg.sender);
+
+        emit apartmentBought(_apartmentAddress, msg.sender);
     }
-    
-
     
 }

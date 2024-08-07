@@ -47,7 +47,7 @@ contract userContract {
 
     function checkUserExistance(address _userWalletAddress) public view returns (bool)
     {
-        if(bytes(users[_userWalletAddress]).length != 0)
+        if(users[_userWalletAddress].userWalletAddress != address(0))
             return true;
         else
             return false;
