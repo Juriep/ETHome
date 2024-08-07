@@ -45,6 +45,14 @@ contract userContract {
         return users[msg.sender];
     }
 
+    function checkUserExistance(address _userWalletAddress) public view returns (bool)
+    {
+        if(bytes(users[_userWalletAddress]).length != 0)
+            return true;
+        else
+            return false;
+    }
+
     function updateUser(string memory _name, uint _age) public checkIfUserExist(msg.sender)
     {
 
