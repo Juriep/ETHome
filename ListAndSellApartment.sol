@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import "./apartmentContract.sol";
 import "./userContract.sol";
 
+
 contract ListAndSellApartment {
     
     userContract private user;
