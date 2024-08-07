@@ -10,7 +10,7 @@ contract apartmentContract {
     // store apartments and find them by their city direction
     mapping (string => Apartment) private apartments;
 
-    event NewApartmentAdded(string _apartmentAddress, string _description, uint _price, ApartmentState _aptState ,address _apartmentOwner);
+    event NewApartmentAdded(string _apartmentAddress, string _description, uint _price,address _apartmentOwner);
     event ApartmentDeleted(string _apartmentAddress);
     event ApartmentUpdated(string _apartmentAddress, string _description, uint _price, ApartmentState _aptState ,address _apartmentOwner);
     event ApartmentDirectionChanged(string _oldApartmentAddress, string _newApartmentAdress);
@@ -20,7 +20,7 @@ contract apartmentContract {
         string description;
         uint price;
         ApartmentState aptState;
-        address apartmentOwner;
+        address payable apartmentOwner;
     }
 
     modifier onlyNewApartment(string memory _apartmentAddress){
@@ -41,11 +41,19 @@ contract apartmentContract {
     }
 
 
-    function addApartment(string memory _apartmentAddress, string memory _description, uint _price, ApartmentState _aptState ,address _apartmentOwner) public 
+    function searchIfApartmentExists(string memory _apartmentAddress) public view returns (bool)
+    {
+        if(bytes(apartments[_apartmentAddress].apartmentAddress).length != 0)
+            return true;
+        else
+            return false;
+    }
+
+    function addApartment(string memory _apartmentAddress, string memory _description, uint _price ,address _apartmentOwner) public 
         onlyNewApartment(_apartmentAddress)
     {
-        apartments[_apartmentAddress] = Apartment(_apartmentAddress,  _description, _price, _aptState, _apartmentOwner);
-        emit NewApartmentAdded(_apartmentAddress,  _description, _price, _aptState, _apartmentOwner);
+        apartments[_apartmentAddress] = Apartment(_apartmentAddress,  _description, _price, ApartmentState.Vacant, payable(_apartmentOwner));
+        emit NewApartmentAdded(_apartmentAddress,  _description, _price, _apartmentOwner);
     }
 
     function getApartment(string memory _apartmentAddress) public view ifApartmentExists(_apartmentAddress) returns (Apartment memory)
@@ -53,9 +61,22 @@ contract apartmentContract {
         return apartments[_apartmentAddress];
     }
 
-    function getApartmentState(string memory _apartmentAddress) public view returns (ApartmentState)
+    function isApartmentVacant(string memory _apartmentAddress) public view returns (bool)
     {
-        return apartments[_apartmentAddress].aptState;
+        if(apartments[_apartmentAddress].aptState == ApartmentState.Vacant)
+            return true;
+        else
+            return false;
+    }
+
+    function getApartmentOwner(string memory _apartmentAddress) public view ifApartmentExists(_apartmentAddress) returns (address)
+    {
+        return apartments[_apartmentAddress].apartmentOwner;
+    }
+
+    function getApartmentPrice(string memory _apartmentAddress) public view ifApartmentExists(_apartmentAddress) returns (uint)
+    {
+        return apartments[_apartmentAddress].price;
     }
 
     function updateApartmentParams(string memory _apartmentAddress, string memory _description, uint _price, ApartmentState _aptState,address _apartmentOwner) public ifApartmentExists(_apartmentAddress)
@@ -63,7 +84,7 @@ contract apartmentContract {
         apartments[_apartmentAddress].description = _description;
         apartments[_apartmentAddress].price = _price;
         apartments[_apartmentAddress].aptState = _aptState;
-        apartments[_apartmentAddress].apartmentOwner = _apartmentOwner;
+        apartments[_apartmentAddress].apartmentOwner = payable(_apartmentOwner);
 
         emit ApartmentUpdated(_apartmentAddress,  _description, _price, _aptState, _apartmentOwner);
     }
@@ -85,6 +106,11 @@ contract apartmentContract {
     {
         delete apartments[_apartmentAddress];
         emit ApartmentDeleted(_apartmentAddress);
+    }
+
+    function changeAparmentOwner(string memory _apartmentAddress, address _newOwner) public ifApartmentExists(_apartmentAddress)
+    {
+        apartments[_apartmentAddress].apartmentOwner = payable(_newOwner);
     }
 
 }
