@@ -1,0 +1,113 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\sebas\\OneDrive\\Documentos\\Blockchain\\ETHome\\contracts\\apartmentContract.sol": {
+      "lastModificationDate": 1723265185612,
+      "contentHash": "6357050ddabe25fc9abc5ec5864f2c0b",
+      "sourceName": "contracts/apartmentContract.sol",
+      "solcConfig": {
+        "version": "0.8.18",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.8.18"
+      ],
+      "artifacts": [
+        "apartmentContract"
+      ]
+    },
+    "C:\\Users\\sebas\\OneDrive\\Documentos\\Blockchain\\ETHome\\contracts\\ListAndSellApartment.sol": {
+      "lastModificationDate": 1723265186820,
+      "contentHash": "57762f3e12fa168c0200bd1b4b219a5f",
+      "sourceName": "contracts/ListAndSellApartment.sol",
+      "solcConfig": {
+        "version": "0.8.18",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./apartmentContract.sol",
+        "./userContract.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.18"
+      ],
+      "artifacts": [
+        "ListAndSellApartment"
+      ]
+    },
+    "C:\\Users\\sebas\\OneDrive\\Documentos\\Blockchain\\ETHome\\contracts\\userContract.sol": {
+      "lastModificationDate": 1723265191475,
+      "contentHash": "09587ef468d28a8459425f8eb03caae9",
+      "sourceName": "contracts/userContract.sol",
+      "solcConfig": {
+        "version": "0.8.18",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.18"
+      ],
+      "artifacts": [
+        "userContract"
+      ]
+    }
+  }
+}
