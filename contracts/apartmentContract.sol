@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.18;
 
+error apartmentFound(string owner, address apartmentOwner);
+error apartmentNotFound(string apartmentAddress);
+
 contract apartmentContract {
     
     enum ApartmentState{
@@ -24,19 +27,20 @@ contract apartmentContract {
     }
 
     modifier onlyNewApartment(string memory _apartmentAddress){
-
-        require( bytes(apartments[_apartmentAddress].apartmentAddress).length == 0, "Apartment already exists!");
+        if(bytes(apartments[_apartmentAddress].apartmentAddress).length != 0)
+            revert apartmentFound("Owner: ",apartments[_apartmentAddress].apartmentOwner);
         _;
-
     }
 
     modifier ifApartmentExists(string memory _apartmentAddress) {
-        require( bytes(apartments[_apartmentAddress].apartmentAddress).length != 0, "Apartment does not exist!");
+        if(bytes(apartments[_apartmentAddress].apartmentAddress).length == 0)
+            revert apartmentNotFound(_apartmentAddress);
         _;
     }
 
     modifier ifOldApartmentExist(string memory _apartmentAddress){
-        require( bytes(apartments[_apartmentAddress].apartmentAddress).length != 0, "Apartment does not exist!");
+        if(bytes(apartments[_apartmentAddress].apartmentAddress).length == 0)
+            revert apartmentNotFound(_apartmentAddress);
         _;
     }
 
