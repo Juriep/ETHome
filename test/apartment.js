@@ -141,6 +141,73 @@ describe("Apartment contract test", function(){
     
     })
 
+    it("Should update an existing apartment, and check if it's vacant or not", async function(){
 
+        const {apartment, apartmentOwner, randomUser} = await loadFixture(fixture);
+
+        const tx = await apartment.connect(apartmentOwner).
+            addApartment("Ciudadela comfenalco", "Beautiful house", 50, apartmentOwner.address);
+
+        await tx.wait();
+
+        const readApt = await apartment.getApartment("Ciudadela comfenalco");
+
+        expect(readApt.apartmentAddress).to.equal("Ciudadela comfenalco");
+        expect(readApt.description).to.equal("Beautiful house");
+        expect(readApt.price).to.equal(50);
+        expect(readApt.apartmentOwner).to.equal(apartmentOwner.address);
+
+        // now lets modified the information of the apartment
+
+        const updateTx = await apartment.updateApartmentParams("Ciudadela comfenalco", "Palace", 100, 1 , randomUser.address); 
+        await updateTx.wait();
+
+        await expect(updateTx).to.emit(apartment, "ApartmentUpdated").withArgs(
+            "Ciudadela comfenalco","Palace", 100, 1 ,randomUser.address
+        );
+
+        const readAptUpdated = await apartment.getApartment("Ciudadela comfenalco");
+
+        expect(readAptUpdated.apartmentAddress).to.equal("Ciudadela comfenalco");
+        expect(readAptUpdated.description).to.equal("Palace");
+        expect(readAptUpdated.price).to.equal(100);
+        expect(readAptUpdated.apartmentOwner).to.equal(randomUser.address);
+
+        expect(
+          await apartment.isApartmentVacant("Ciudadela comfenalco")
+        ).to.equal(false);
+
+    })
+
+    it("Should update apartment direction", async function(){
+
+        const {apartment, apartmentOwner, randomUser} = await loadFixture(fixture);
+
+        const tx = await apartment.connect(apartmentOwner).
+        addApartment("Ciudadela comfenalco", "Beautiful house", 50, apartmentOwner.address);
+
+        await tx.wait();
+
+        const updateAddressTx = await apartment.updateApartmentDirection("Ciudadela comfenalco", "Providencia");
+        await updateAddressTx.wait();
+
+        expect(updateAddressTx).to.emit(apartment, "ApartmentDirectionChanged").withArgs(
+            "Ciudadela comfenalco", "Providencia"
+        );
+
+        const apt = await apartment.getApartment("Providencia");
+        
+        expect(apt.apartmentAddress).to.equal("Providencia");
+        expect(apt.description).to.equal("Beautiful house");
+        expect(apt.price).to.equal(50);
+        expect(apt.apartmentOwner).to.equal(apartmentOwner.address);
+
+        // read to see if old direction exists, it should be false
+
+        await expect(
+            apartment.getApartment("Ciudadela comfenalco")
+        ).to.be.revertedWithCustomError(apartment, "apartmentNotFound").withArgs("Ciudadela comfenalco");
+
+    })
 
 });
