@@ -5,6 +5,7 @@ import "./apartmentContract.sol";
 import "./userContract.sol";
 
 error notTheOwner(address user);
+error NotEnoughEther(uint256 eth);
 
 contract ListAndSellApartment {
     
@@ -43,13 +44,14 @@ contract ListAndSellApartment {
         _;
     }
 
-    modifier ifPriceIsCorrect(string memory _apartmentAddress, uint _price)
+    modifier ifPriceIsCorrect(string memory _apartmentAddress, uint256 _price)
     {
-        require(apartment.getApartmentPrice(_apartmentAddress) == _price, "You do not have enogh Eth!");
+        if(apartment.getApartmentPrice(_apartmentAddress) != _price)
+            revert NotEnoughEther(_price);
         _;
     }
 
-    function listAnApartment(string memory _apartmentAddress, string memory _description, uint _price) public onlyIfUserExists(msg.sender)
+    function listAnApartment(string memory _apartmentAddress, string memory _description, uint256 _price) public onlyIfUserExists(msg.sender)
     {
         apartment.addApartment(_apartmentAddress,  _description, _price,  msg.sender);
         emit apartmentOwnershipAdded(_apartmentAddress, msg.sender);

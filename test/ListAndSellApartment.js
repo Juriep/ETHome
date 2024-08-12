@@ -2,6 +2,7 @@ const {loadFixture, } = require("@nomicfoundation/hardhat-toolbox/network-helper
 
 const {expect} = require("chai");
 const {ethers} = require("hardhat");
+const { BigNumber } = ethers;
 
 describe("List and Sell apartment contract tests", function(){
 
@@ -83,15 +84,11 @@ describe("List and Sell apartment contract tests", function(){
 
             // now that the user is created it can list an apartment for sale
 
-            const listApt = await listAndSell.connect(owner).listAnApartment("Milan 170",
-                 "Apartment 2 rooms", 200);
-
+            const listApt = await listAndSell.connect(owner).listAnApartment("Milan 170","Apartment 2 rooms", ethers.parseEther("200"));
             await listApt.wait();
 
-            expect(listApt).to.emit(listAndSell, "apartmentOwnershipAdded").
-                                                    withArgs("Milan 170", owner.address);
+            expect(listApt).to.emit(listAndSell, "apartmentOwnershipAdded").withArgs("Milan 170", owner.address);
             
-
             // now lets create a random user
             
             const randU = await user.connect(randomUser).addUser("Julio",18);
@@ -99,11 +96,20 @@ describe("List and Sell apartment contract tests", function(){
 
             expect(randU).to.emit(user, "NewUserAdded").withArgs(randomUser.address, "Julio", 18);
 
-            // Now lets buy the apartment
+            // now lets buy the apartment
 
-            const buyApt = await listAndSell.connect(randomUser).BuyApartment("Milan 170");
+            await expect(
+                listAndSell.connect(randomUser).BuyApartment("Milan 170", { value: ethers.parseEther("199") })
+            ).to.be.revertedWithCustomError(listAndSell, "NotEnoughEther").withArgs(ethers.parseEther("199"));
+    
+            const buyApartmentTx = await listAndSell.connect(randomUser).BuyApartment("Milan 170", {value: ethers.parseEther("200")});
+            await buyApartmentTx.wait();
+            expect(buyApartmentTx).to.emit(listAndSell, "apartmentBought").withArgs("Milan 170", randomUser.address);
+
+            expect(
+                await apartment.getApartmentOwner("Milan 170")
+            ).to.equal(randomUser.address);
 
         })
-
 
 })
