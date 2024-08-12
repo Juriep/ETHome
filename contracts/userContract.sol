@@ -34,7 +34,7 @@ contract userContract {
     function addUser(string memory _name, uint _age) public onlyNewUser(msg.sender)
     {
         require(bytes(_name).length > 0, "The name can not be empty!");
-        require(_age >= 18, "Current user does not meet the minimum age required!");
+        require(_age > 17, "Current user does not meet the minimum age required!");
 
         users[msg.sender] = User(msg.sender, _name, _age);
         emit NewUserAdded(msg.sender, _name, _age);
@@ -57,7 +57,7 @@ contract userContract {
     {
 
         require(bytes(_name).length > 0, "The name can not be empty!");
-        require(_age >= 18, "Current user does not meet the minimum age required!");
+        require(_age > 17, "Current user does not meet the minimum age required!");
 
         users[msg.sender].name = _name;
         users[msg.sender].age = _age;

@@ -13,15 +13,15 @@ contract apartmentContract {
     // store apartments and find them by their city direction
     mapping (string => Apartment) private apartments;
 
-    event NewApartmentAdded(string _apartmentAddress, string _description, uint _price,address _apartmentOwner);
+    event NewApartmentAdded(string _apartmentAddress, string _description, uint256 _price,address _apartmentOwner);
     event ApartmentDeleted(string _apartmentAddress);
-    event ApartmentUpdated(string _apartmentAddress, string _description, uint _price, ApartmentState _aptState ,address _apartmentOwner);
+    event ApartmentUpdated(string _apartmentAddress, string _description, uint256 _price, ApartmentState _aptState ,address _apartmentOwner);
     event ApartmentDirectionChanged(string _oldApartmentAddress, string _newApartmentAdress);
 
     struct Apartment{
         string apartmentAddress;
         string description;
-        uint price;
+        uint256 price;
         ApartmentState aptState;
         address payable apartmentOwner;
     }
@@ -53,7 +53,7 @@ contract apartmentContract {
             return false;
     }
 
-    function addApartment(string memory _apartmentAddress, string memory _description, uint _price ,address _apartmentOwner) public 
+    function addApartment(string memory _apartmentAddress, string memory _description, uint256 _price ,address _apartmentOwner) public 
         onlyNewApartment(_apartmentAddress)
     {
         apartments[_apartmentAddress] = Apartment(_apartmentAddress,  _description, _price, ApartmentState.Vacant, payable(_apartmentOwner));
@@ -78,12 +78,12 @@ contract apartmentContract {
         return apartments[_apartmentAddress].apartmentOwner;
     }
 
-    function getApartmentPrice(string memory _apartmentAddress) public view ifApartmentExists(_apartmentAddress) returns (uint)
+    function getApartmentPrice(string memory _apartmentAddress) public view ifApartmentExists(_apartmentAddress) returns (uint256)
     {
         return apartments[_apartmentAddress].price;
     }
 
-    function updateApartmentParams(string memory _apartmentAddress, string memory _description, uint _price, ApartmentState _aptState,address _apartmentOwner) public ifApartmentExists(_apartmentAddress)
+    function updateApartmentParams(string memory _apartmentAddress, string memory _description, uint256 _price, ApartmentState _aptState,address _apartmentOwner) public ifApartmentExists(_apartmentAddress)
     {
         apartments[_apartmentAddress].description = _description;
         apartments[_apartmentAddress].price = _price;

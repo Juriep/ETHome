@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import "./apartmentContract.sol";
 import "./userContract.sol";
 
+error notTheOwner(address user);
 
 contract ListAndSellApartment {
     
@@ -37,7 +38,8 @@ contract ListAndSellApartment {
 
     modifier onlyOwner(address _user, string memory _apartmentAddress)
     {
-        require(apartment.getApartmentOwner(_apartmentAddress) == _user, "Sorry you do not have permissions to complete thhis task!");
+        if(apartment.getApartmentOwner(_apartmentAddress) != _user)
+            revert notTheOwner(_user);
         _;
     }
 
