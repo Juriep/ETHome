@@ -1,0 +1,26 @@
+{
+  "name": "ethome",
+  "version": "1.0.0",
+  "description": "this Dapp allows users to buy and sell an apartment with cryptocurrency",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juriep/ETHome.git"
+  },
+  "author": "Juriep",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Juriep/ETHome/issues"
+  },
+  "homepage": "https://github.com/Juriep/ETHome#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.8"
+  },
+  "dependencies": {
+    "ethers": "^6.13.2"
+  }
+}
