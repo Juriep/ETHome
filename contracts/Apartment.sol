@@ -62,6 +62,12 @@ contract Apartment {
         emit apartmentAdded(newApartmentID, nftTokenId, _ipfsHash, apartmentStatus.Vacant);
     }
 
+    function getApartmentInfo(uint256 _apartmentID) public view
+    checkApartmentExistance(_apartmentID) returns (apartmentInfo memory)
+    {
+        return apartments[_apartmentID];
+    }
+
     function updateApartmentParams(uint256 _apartmentID, string memory _newIpfsHash, 
     apartmentStatus _aptStatus)
     public checkApartmentExistance(_apartmentID) onlyOwner(_apartmentID)
