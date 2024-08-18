@@ -26,7 +26,6 @@ contract apartmentNFT is ERC721URIStorage {
 
     function burnNFT(uint256 _nftTokenID) public
     {
-        require(msg.sender == ownerOf(_nftTokenID), "You do not have permissions to burn this NFT");
         _burn(_nftTokenID);
     }
 

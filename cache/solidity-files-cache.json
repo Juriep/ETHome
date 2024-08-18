@@ -76,8 +76,8 @@
       ]
     },
     "C:\\Users\\sebas\\OneDrive\\Documentos\\Blockchain\\ETHome\\contracts\\Apartment.sol": {
-      "lastModificationDate": 1723928585227,
-      "contentHash": "a2c7c6684ac37409f91ac5a75fbda451",
+      "lastModificationDate": 1724004863383,
+      "contentHash": "89806b1cdc77bf63617e7fe1e4207517",
       "sourceName": "contracts/Apartment.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -114,8 +114,8 @@
       ]
     },
     "C:\\Users\\sebas\\OneDrive\\Documentos\\Blockchain\\ETHome\\contracts\\apartmentNFT.sol": {
-      "lastModificationDate": 1723920826420,
-      "contentHash": "f29f568c72562ef2e81d530fde9b7daa",
+      "lastModificationDate": 1724002251053,
+      "contentHash": "296a7f837ba59bcbdf3698f249080882",
       "sourceName": "contracts/apartmentNFT.sol",
       "solcConfig": {
         "version": "0.8.20",

@@ -33,7 +33,7 @@ contract Apartment {
     }
 
     modifier checkApartmentExistance(uint256 apartmentID){
-        if(apartmentID > apartmentCounter)
+        if (apartmentID >= apartmentCounter)
             revert apartmetnDoesNotExist(apartmentID);
         _;
     }
@@ -79,13 +79,11 @@ contract Apartment {
         _newIpfsHash, _aptStatus);
     }
 
-    function deleteApartment(uint256 _apartmentID) public onlyOwner(_apartmentID)
-    checkApartmentExistance(_apartmentID)
+    function deleteApartment(uint256 _apartmentID) public checkApartmentExistance(_apartmentID)
+    onlyOwner(_apartmentID)
     {
-        delete apartments[_apartmentID];
         aptNFT.burnNFT(apartments[_apartmentID].nftTokenId);
-
         emit apartmentDeleted(apartments[_apartmentID].nftTokenId, _apartmentID);
+        delete apartments[_apartmentID]; 
     }
-
 }

@@ -13,8 +13,6 @@ describe("User contract", function (){
 
         await userCt.waitForDeployment();
 
-        console.log(userCt.target);
-
         return {userCt, user1, user2};
     }
 
