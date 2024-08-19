@@ -18,6 +18,8 @@ contract ListAndSellApartment {
 
     address payable public apartmenOwner; 
 
+    event ApartmentBought(uint256 apartmentID, address newOwner);
+
     constructor(address _aptDeployedAddress, address _aptNFTDeployedAddress)
     {
         apartment = Apartment(_aptDeployedAddress);
@@ -29,15 +31,6 @@ contract ListAndSellApartment {
     {
         if(user.checkUserExistance(msg.sender) != true)
             revert UserIsNotRegistered(msg.sender);
-        _;
-    }
-
-    modifier onlyApartmentOwner(uint256 _apartmentID)
-    {
-        uint256 nftToken = apartment.getApartmentNftTokenID(_apartmentID);
-
-        if(msg.sender != aptNFT.ownerOf(nftToken))
-            revert notTheOwner(msg.sender);
         _;
     }
 
@@ -55,7 +48,7 @@ contract ListAndSellApartment {
         _;
     }
 
-    function listApartmentForSale(string memory _IPFSHash, uint256 _ethPrice) public ifUserExist()
+    function listApartmentForSale(string memory _IPFSHash, uint256 _ethPrice) external ifUserExist()
     {
         apartment.addApartment(_IPFSHash, _ethPrice);
     }
@@ -64,7 +57,7 @@ contract ListAndSellApartment {
     //with the apartment ID, so this ID can be store on chain and at the moment
     // of clicking to buy an apartment on the frontend it must inject the corresponding
     // ID on the callback to pass it to the buyApartment method
-    function buyApartment(uint256 _apartmentID) public payable checkIfApartmentExist(_apartmentID)
+    function buyApartment(uint256 _apartmentID) external payable checkIfApartmentExist(_apartmentID)
     checkTransactionPrice(_apartmentID, msg.value)
     {
 
@@ -75,6 +68,9 @@ contract ListAndSellApartment {
         // transfer ether to the owner
         payable(owner).transfer(msg.value);
 
+        aptNFT.transferNftProperty(nftToken);
+
+        emit ApartmentBought(_apartmentID, msg.sender);
         
     }
     
