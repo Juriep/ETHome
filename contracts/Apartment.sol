@@ -8,8 +8,8 @@ error userNotAuthorized(address _user);
 
 contract Apartment {
 
-    event apartmentAdded(uint256 apartmentID, uint256 nftTokenID, string ipfsHash, apartmentStatus aptStatus);
-    event apartmentUpdated(uint256 apartmentID, uint256 nftTokenId, string ipfsHash, apartmentStatus aptStatus);
+    event apartmentAdded(uint256 apartmentID, uint256 nftTokenID, string ipfsHash, address owner, uint256 ethPrice);
+    event apartmentUpdated(uint256 apartmentID, uint256 nftTokenId, string ipfsHash, uint256 ethPrice);
     event apartmentDeleted(uint256 ntfTokenID, uint256 apartmentId);
 
     enum apartmentStatus{
@@ -20,7 +20,8 @@ contract Apartment {
     {
         string ipfsHash; // CID pointing to the apartment data on IPFS
         uint256 nftTokenId;
-        apartmentStatus aptStatus;
+        address owner;
+        uint256 ethPrice;
     }
 
     apartmentNFT public aptNFT;
@@ -45,7 +46,25 @@ contract Apartment {
         _;
     }
 
-    function addApartment(string memory _ipfsHash) public
+    function apartmentExists(uint256 _apartmentID) public view returns (bool)
+    {
+        if(apartments[_apartmentID].owner != address(0))
+            return true;
+        else
+            return false;
+    }
+
+    function getApartmentNftTokenID(uint256 _apartmentID) public view returns(uint256)
+    {
+        return apartments[_apartmentID].nftTokenId;
+    }
+
+    function getApartmentEthPrice(uint256 _apartmentID) public view returns(uint256)
+    {
+        return apartments[_apartmentID].ethPrice;
+    }
+
+    function addApartment(string memory _ipfsHash, uint256 _ethPrice) public
     {
         uint256 newApartmentID = apartmentCounter;
 
@@ -55,11 +74,11 @@ contract Apartment {
 
         // store apartment info with IPFS and nftTokenID
 
-        apartments[newApartmentID] = apartmentInfo(_ipfsHash, nftTokenId, apartmentStatus.Vacant);
+        apartments[newApartmentID] = apartmentInfo(_ipfsHash, nftTokenId, msg.sender, _ethPrice);
 
         apartmentCounter++;
 
-        emit apartmentAdded(newApartmentID, nftTokenId, _ipfsHash, apartmentStatus.Vacant);
+        emit apartmentAdded(newApartmentID, nftTokenId, _ipfsHash, msg.sender, _ethPrice);
     }
 
     function getApartmentInfo(uint256 _apartmentID) public view
@@ -68,15 +87,12 @@ contract Apartment {
         return apartments[_apartmentID];
     }
 
-    function updateApartmentParams(uint256 _apartmentID, string memory _newIpfsHash, 
-    apartmentStatus _aptStatus)
+    function updateApartmentParams(uint256 _apartmentID, string memory _newIpfsHash, uint256 _ethPrice)
     public checkApartmentExistance(_apartmentID) onlyOwner(_apartmentID)
     {
         apartments[_apartmentID].ipfsHash = _newIpfsHash;
-        apartments[_apartmentID].aptStatus = _aptStatus;
-
         emit apartmentUpdated(_apartmentID, apartments[_apartmentID].nftTokenId,
-        _newIpfsHash, _aptStatus);
+        _newIpfsHash, _ethPrice);
     }
 
     function deleteApartment(uint256 _apartmentID) public checkApartmentExistance(_apartmentID)

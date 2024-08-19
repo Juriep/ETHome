@@ -70,7 +70,7 @@ describe("Apartment Contract Tests", function(){
 
         await expect(
             apartment.connect(randomUser).
-            updateApartmentParams(0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", 1)
+            updateApartmentParams(0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN")
         ).to.be.revertedWithCustomError(apartment, "userNotAuthorized").withArgs(randomUser.address);
 
         // Try to update an uncreated apartment, this transaction must be reverted with the
@@ -78,19 +78,19 @@ describe("Apartment Contract Tests", function(){
 
         await expect(
             apartment.connect(owner).
-            updateApartmentParams(3, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", 0)
+            updateApartmentParams(3, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN")
         ).to.be.revertedWithCustomError(apartment, "apartmetnDoesNotExist").withArgs(3);
        
         // The owner of an apartment wants to update his apartment information, this 
         //transaction must be allow
 
         const updateApt = await apartment.connect(owner).updateApartmentParams(
-            0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", 1
+            0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN"
         );
         await updateApt.wait();
 
         await expect(updateApt).to.emit(apartment, "apartmentUpdated").withArgs(
-            0, apartmentInfo.nftTokenId, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", 1 
+            0, apartmentInfo.nftTokenId, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN" 
         );
     })
 
