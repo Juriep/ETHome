@@ -4,6 +4,8 @@ pragma solidity ^0.8.20;
 error UserNotFound(address userAddress);
 error UserFound(address userAddress);
 
+import "hardhat/console.sol";
+
 contract userContract {
     
     mapping (address => User ) private users;
@@ -44,9 +46,9 @@ contract userContract {
         return users[msg.sender];
     }
 
-    function checkUserExistance(address _userWalletAddress) public view returns (bool)
+    function checkUserExistance(address _user) public view returns (bool)
     {
-        if(users[_userWalletAddress].userWalletAddress != address(0))
+        if(users[_user].userWalletAddress != address(0))
             return true;
         else
             return false;

@@ -1,115 +1,136 @@
-// const {loadFixture, } = require("@nomicfoundation/hardhat-toolbox/network-helpers")
+const {loadFixture, } = require("@nomicfoundation/hardhat-toolbox/network-helpers")
 
-// const {expect} = require("chai");
-// const {ethers} = require("hardhat");
-// const { BigNumber } = ethers;
+const {expect} = require("chai");
+const {ethers} = require("hardhat");
 
-// describe("List and Sell apartment contract tests", function(){
+describe("List and sell apartment contract tests", function(){
 
-//         async function fixture()
-//         {
-//             const user = await ethers.deployContract("userContract");
-//             await user.waitForDeployment();
+    async function fixture()
+    {
 
-//             const apartment = await ethers.deployContract("apartmentContract");
-//             await apartment.waitForDeployment();
+        const aptNFT = await ethers.deployContract("apartmentNFT");
+        await aptNFT.waitForDeployment();
 
-//             const listAndSell = await ethers.deployContract(
-//                 "ListAndSellApartment",[user.target, apartment.target]
-//             );
-//             await listAndSell.waitForDeployment();
+        const apartment = await ethers.deployContract("Apartment", [aptNFT.target]);
+        await apartment.waitForDeployment();
 
-//             const [owner, randomUser] = await ethers.getSigners();
+        const user = await ethers.deployContract("userContract");
+        await user.waitForDeployment();
 
-//             return {listAndSell, user, apartment,owner, randomUser};
-//         }
+        const listAndSellApartment = await ethers.deployContract("ListAndSellApartment", [
+            apartment.target, aptNFT.target, user.target
+        ]);
+        await listAndSellApartment.waitForDeployment();
 
-//         it("Should create a new apartment for an specific user, and delete it if"
-//             + " the owner wants to", async function(){
 
-//             const {listAndSell, user, apartment, owner, randomUser} = await loadFixture(fixture);
+        const [owner, randomUser] = await ethers.getSigners();
 
-//             // create a new user
+        return {listAndSellApartment, apartment, aptNFT, user, owner, randomUser};
 
-//             const tx = await user.connect(owner).addUser("Juriep",18);
-//             await tx.wait();
+    }
 
-//             expect(tx).to.emit(user, "NewUserAdded").withArgs(owner.address, "Juriep", 18);
+    it("Should list an apartment for sell if user is registered", async function(){
 
-//             // now that the user is created it can list an apartment for sale
+        const {listAndSellApartment, apartment, aptNFT, user, owner, randomUser} = await loadFixture(fixture);
 
-//             const listApt = await listAndSell.connect(owner).listAnApartment("Milan 170",
-//                  "Apartment 2 rooms", 200);
+        // First the user must register into the Dapp
 
-//             await listApt.wait();
+        const userRegistrationTx = await user.connect(owner).addUser("Juriep", 25);
+        await userRegistrationTx.wait();
 
-//             expect(listApt).to.emit(listAndSell, "apartmentOwnershipAdded").
-//                                                     withArgs("Milan 170", owner.address);
-            
+        await expect(userRegistrationTx).to.emit(user, "NewUserAdded").withArgs(
+            owner.address, "Juriep", 25
+        );
 
-//             // now let's delete the created apartment
+        // now lets list an apartment for the registered user
 
-//             // first let's try to delete it from a user which is not the owner
-//             // this operation should be reverted
-            
-//             const randU = await user.connect(randomUser).addUser("Julio",18);
-//             await randU.wait();
+        const apartmentListingTx = await listAndSellApartment.connect(owner).listApartmentForSale(
+            "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150")
+        );
+        await apartmentListingTx.wait();
 
-//             expect(randU).to.emit(user, "NewUserAdded").withArgs(randomUser.address, "Julio", 18);
+        await expect(apartmentListingTx).to.emit(apartment, "apartmentAdded");        
 
-//             await expect(
-//                 listAndSell.connect(randomUser).deleteApartment("Milan 170")
-//             ).to.be.revertedWithCustomError(listAndSell, "notTheOwner").withArgs(randomUser.address);
+        // now a random user tries to list an apartment
+        // transaction mus be rejected
 
-//             // now lets delete it using the owner address
+        await expect(
+            listAndSellApartment.connect(randomUser).listApartmentForSale(
+                "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("100")
+            )
+        ).to.be.revertedWithCustomError(listAndSellApartment, "UserIsNotRegistered").
+        withArgs(randomUser.address);
 
-//             expect(
-//                 listAndSell.connect(owner).deleteApartment("Milan 170")
-//             ).to.emit(apartment, "ApartmentDeleted").withArgs("Milan 170");
+    });
 
-//         })
+    it("A user wants to buy a lited apartment", async function(){
 
-//         it("Should assign an apartment to the new owner who bought it "
-//             + "price and ether provider must be checked in order to transfer the ownership"
-//             + " of the apartment to the person who wants to buy it", async function(){
+        const {listAndSellApartment, apartment, aptNFT, user, owner, randomUser} = await loadFixture(fixture);
 
-//             const {listAndSell, user, apartment, owner, randomUser} = await loadFixture(fixture);
-            
-//             // create a new user
+        // First the owner of the apartment must register into the Dapp
+        // in order to list the apartement he wants to sell
 
-//             const tx = await user.connect(owner).addUser("Juriep",18);
-//             await tx.wait();
+        const userRegistrationTx = await user.connect(owner).addUser("Juriep", 25);
+        await userRegistrationTx.wait();
 
-//             expect(tx).to.emit(user, "NewUserAdded").withArgs(owner.address, "Juriep", 18);
+        await expect(userRegistrationTx).to.emit(user, "NewUserAdded").withArgs(
+            owner.address, "Juriep", 25
+        );
 
-//             // now that the user is created it can list an apartment for sale
+        // now lets list an apartment for the registered user
 
-//             const listApt = await listAndSell.connect(owner).listAnApartment("Milan 170","Apartment 2 rooms", ethers.parseEther("200"));
-//             await listApt.wait();
+        const apartmentListingTx = await listAndSellApartment.connect(owner).listApartmentForSale(
+            "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150")
+        );
+        await apartmentListingTx.wait();
 
-//             expect(listApt).to.emit(listAndSell, "apartmentOwnershipAdded").withArgs("Milan 170", owner.address);
-            
-//             // now lets create a random user
-            
-//             const randU = await user.connect(randomUser).addUser("Julio",18);
-//             await randU.wait();
+        // Now the random user who wants to buy the apartment created above must be
+        // registered too, otherwise the buy transaction will be reverted
 
-//             expect(randU).to.emit(user, "NewUserAdded").withArgs(randomUser.address, "Julio", 18);
+        // Try to buy an apartment with an unregistered user:
 
-//             // now lets buy the apartment
+        await expect(
+            listAndSellApartment.connect(randomUser).buyApartment(0, { value: ethers.parseEther("150") })
+        ).to.be.revertedWithCustomError(listAndSellApartment, "UserIsNotRegistered").
+        withArgs(randomUser.address);
 
-//             await expect(
-//                 listAndSell.connect(randomUser).BuyApartment("Milan 170", { value: ethers.parseEther("199") })
-//             ).to.be.revertedWithCustomError(listAndSell, "NotEnoughEther").withArgs(ethers.parseEther("199"));
+        // Now lets registered the random user and buy the apartment
+
+        const randomUserRegistrationTx = await user.connect(randomUser).addUser("Oknatip", 27);
+        await randomUserRegistrationTx.wait();
+
+        await expect(randomUserRegistrationTx).to.emit(user, "NewUserAdded").withArgs(
+            randomUser.address, "Oknatip", 27
+        );
+
+        // try to buy the apartment with less ether than the amount required
+        // transaction must be reverted
+
+        await expect(
+            listAndSellApartment.connect(randomUser).buyApartment(0, { value: ethers.parseEther("149")})
+        ).to.be.revertedWithCustomError(listAndSellApartment, "NotEnoughEther").withArgs(ethers.parseEther("149"));
+
+        // Now lets buy the apartment
+
+        const buyApartmentTx = await listAndSellApartment.connect(randomUser).buyApartment(
+            0, { value: ethers.parseEther("150") }
+        );
+        await buyApartmentTx.wait();  
     
-//             const buyApartmentTx = await listAndSell.connect(randomUser).BuyApartment("Milan 170", {value: ethers.parseEther("200")});
-//             await buyApartmentTx.wait();
-//             expect(buyApartmentTx).to.emit(listAndSell, "apartmentBought").withArgs("Milan 170", randomUser.address);
+        await expect(buyApartmentTx).to.emit(listAndSellApartment, "ApartmentBought").withArgs(
+            0, randomUser.address
+        );
 
-//             expect(
-//                 await apartment.getApartmentOwner("Milan 170")
-//             ).to.equal(randomUser.address);
+        // check apartment owner, should be the address of the random user
 
-//         })
+        const nftTokenId = await apartment.getApartmentNftTokenID(0);        
 
-// })
+        const nftOwner = aptNFT.getNftOwner(nftTokenId);
+
+        expect(
+            await nftOwner
+        ).to.be.equal(randomUser.address);
+
+    });
+
+})

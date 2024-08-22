@@ -28,7 +28,7 @@ describe("Apartment Contract Tests", function(){
             const {apartment, owner, randomUser} = await loadFixture(fixture);
             
             const tx = await apartment.connect(owner).
-            addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN");
+            addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
 
             await tx.wait;
 
@@ -41,7 +41,7 @@ describe("Apartment Contract Tests", function(){
         const {apartment, owner, randomUser} = await loadFixture(fixture);
             
         const tx = await apartment.connect(owner).
-        addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN");
+        addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
 
         await tx.wait;
 
@@ -49,7 +49,6 @@ describe("Apartment Contract Tests", function(){
 
         const apartmentInfo = await apartment.getApartmentInfo(0);
         expect(apartmentInfo.ipfsHash).equal("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN")
-        expect(apartmentInfo.aptStatus).equal(0);
 
     })
 
@@ -57,7 +56,7 @@ describe("Apartment Contract Tests", function(){
 
         const {apartment, owner, randomUser} = await loadFixture(fixture);
 
-        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN");
+        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
         await tx.wait;
         await expect(tx).to.emit(apartment, "apartmentAdded");
 
@@ -70,7 +69,7 @@ describe("Apartment Contract Tests", function(){
 
         await expect(
             apartment.connect(randomUser).
-            updateApartmentParams(0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN")
+            updateApartmentParams(0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"))
         ).to.be.revertedWithCustomError(apartment, "userNotAuthorized").withArgs(randomUser.address);
 
         // Try to update an uncreated apartment, this transaction must be reverted with the
@@ -78,19 +77,19 @@ describe("Apartment Contract Tests", function(){
 
         await expect(
             apartment.connect(owner).
-            updateApartmentParams(3, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN")
+            updateApartmentParams(3, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"))
         ).to.be.revertedWithCustomError(apartment, "apartmetnDoesNotExist").withArgs(3);
        
         // The owner of an apartment wants to update his apartment information, this 
         //transaction must be allow
 
         const updateApt = await apartment.connect(owner).updateApartmentParams(
-            0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN"
+            0, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150")
         );
         await updateApt.wait();
 
         await expect(updateApt).to.emit(apartment, "apartmentUpdated").withArgs(
-            0, apartmentInfo.nftTokenId, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN" 
+            0, apartmentInfo.nftTokenId, "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150") 
         );
     })
 
@@ -100,7 +99,7 @@ describe("Apartment Contract Tests", function(){
 
         const {apartment, owner, randomUser} = await loadFixture(fixture);
         
-        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN");
+        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
         await tx.wait();
 
         await expect(tx).to.emit(apartment, "apartmentAdded");

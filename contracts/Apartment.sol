@@ -3,15 +3,17 @@ pragma solidity ^0.8.20;
 
 import "./apartmentNFT.sol";
 
+
 error apartmetnDoesNotExist(uint256 apartmentID);
 error userNotAuthorized(address _user);
 
-contract Apartment {
+contract Apartment{
 
     event apartmentAdded(uint256 apartmentID, uint256 nftTokenID, string ipfsHash, address owner, uint256 ethPrice);
     event apartmentUpdated(uint256 apartmentID, uint256 nftTokenId, string ipfsHash, uint256 ethPrice);
     event apartmentDeleted(uint256 ntfTokenID, uint256 apartmentId);
-
+    
+    
     enum apartmentStatus{
         Vacant, Occupied
     }
@@ -27,6 +29,7 @@ contract Apartment {
     apartmentNFT public aptNFT;
     mapping (uint256 => apartmentInfo) public apartments;
     uint256 public apartmentCounter = 0;
+
 
     // the constructor receive the apartmentNFT deploy address
     constructor(address apartmentNFTDeployedAddress) {
@@ -44,6 +47,12 @@ contract Apartment {
         if(aptNFT.ownerOf(apartments[apartmentId].nftTokenId) != msg.sender)
             revert userNotAuthorized(msg.sender);
         _;
+    }
+
+    function apartmentOwner(uint256 _apartmentID) public view checkApartmentExistance(_apartmentID)
+    returns (address) 
+    {
+        return apartments[_apartmentID].owner;
     }
 
     function apartmentExists(uint256 _apartmentID) public view returns (bool)
@@ -64,7 +73,8 @@ contract Apartment {
         return apartments[_apartmentID].ethPrice;
     }
 
-    function addApartment(string memory _ipfsHash, uint256 _ethPrice) public
+    
+    function addApartment(string memory _ipfsHash, uint256 _ethPrice) public 
     {
         uint256 newApartmentID = apartmentCounter;
 
@@ -79,6 +89,7 @@ contract Apartment {
         apartmentCounter++;
 
         emit apartmentAdded(newApartmentID, nftTokenId, _ipfsHash, msg.sender, _ethPrice);
+
     }
 
     function getApartmentInfo(uint256 _apartmentID) public view
