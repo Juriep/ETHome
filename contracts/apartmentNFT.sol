@@ -29,11 +29,6 @@ contract apartmentNFT is ERC721URIStorage {
         _burn(_nftTokenID);
     }
 
-    function transferNftProperty(uint256 _nftTokenID) external
-    {       
-        safeTransferFrom(ownerOf(_nftTokenID), msg.sender, _nftTokenID);
-    }
-    
     function getNftOwner(uint256 _nftTokenID) external view returns (address)
     {
         return ownerOf(_nftTokenID);
