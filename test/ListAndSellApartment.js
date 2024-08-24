@@ -63,7 +63,7 @@ describe("List and sell apartment contract tests", function(){
 
     });
 
-    it("A user wants to buy a lited apartment", async function(){
+    it("A user wants to buy a listed apartment", async function(){
 
         const {listAndSellApartment, apartment, aptNFT, user, owner, randomUser} = await loadFixture(fixture);
 
@@ -84,6 +84,7 @@ describe("List and sell apartment contract tests", function(){
         );
         await apartmentListingTx.wait();
 
+        
         // Now the random user who wants to buy the apartment created above must be
         // registered too, otherwise the buy transaction will be reverted
 
@@ -110,6 +111,14 @@ describe("List and sell apartment contract tests", function(){
             listAndSellApartment.connect(randomUser).buyApartment(0, { value: ethers.parseEther("149")})
         ).to.be.revertedWithCustomError(listAndSellApartment, "NotEnoughEther").withArgs(ethers.parseEther("149"));
 
+
+        // Before Buying the apartment, the owner of the NFT must approve the contract
+        // to manage the specific NFT to be sold
+
+        const nftTokenId = await apartment.getApartmentNftTokenID(0);
+
+        await aptNFT.connect(owner).approve(listAndSellApartment.target, nftTokenId);
+
         // Now lets buy the apartment
 
         const buyApartmentTx = await listAndSellApartment.connect(randomUser).buyApartment(
@@ -121,9 +130,7 @@ describe("List and sell apartment contract tests", function(){
             0, randomUser.address
         );
 
-        // check apartment owner, should be the address of the random user
-
-        const nftTokenId = await apartment.getApartmentNftTokenID(0);        
+        // check apartment owner, should be the address of the random user       
 
         const nftOwner = aptNFT.getNftOwner(nftTokenId);
 
@@ -131,6 +138,60 @@ describe("List and sell apartment contract tests", function(){
             await nftOwner
         ).to.be.equal(randomUser.address);
 
+
     });
+
+    it("Should delete an apartment", async function(){
+
+        const {listAndSellApartment, apartment, aptNFT, user, owner, randomUser} = await loadFixture(fixture);
+
+        // First the owner of the apartment must register into the Dapp
+        // in order to list the apartement he wants to sell
+
+        const userTx = await user.connect(owner).addUser("Juriep", 25);
+        await userTx.wait();
+
+        await expect(userTx).to.emit(user, "NewUserAdded").withArgs(
+            owner.address, "Juriep", 25
+        );
+
+        // now lets list an apartment for the registered user
+
+        const aptListingTx = await listAndSellApartment.connect(owner).listApartmentForSale(
+            "QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150")
+        );
+        await aptListingTx.wait();
+
+        await expect(aptListingTx).to.emit(apartment, "apartmentAdded");
+     
+        // Now lets registered the random user and buy the apartment
+
+        const randUserTx = await user.connect(randomUser).addUser("Oknatip", 27);
+        await randUserTx.wait();
+
+        await expect(randUserTx).to.emit(user, "NewUserAdded").withArgs(
+            randomUser.address, "Oknatip", 27
+        );
+
+        // Random user tries to delete apartment, this transaction must be reverted
+
+        await expect(
+            listAndSellApartment.connect(randomUser).removeApartment(0)
+        ).to.be.revertedWith("The contract is not authorized to burn the NFT");
+
+        // Before deleting the apartment, the user must approve the contract to
+        // execure this task
+    
+        const nftTokenId = await apartment.getApartmentNftTokenID(0);
+        await aptNFT.connect(owner).approve(apartment.target, nftTokenId);
+
+        // Now the owner delete the apartment listed before
+
+        const deleteAptTx = await listAndSellApartment.connect(owner).removeApartment(0);
+        await deleteAptTx.wait();
+
+        expect(deleteAptTx).to.emit(listAndSellApartment, "apartmentRemoved").withArgs(0);
+
+    })
 
 })

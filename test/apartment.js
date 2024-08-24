@@ -16,7 +16,7 @@ describe("Apartment Contract Tests", function(){
         await apartment.waitForDeployment();
 
 
-        return {apartment, owner, randomUser};
+        return {apartment, owner, randomUser, aptNFT};
 
     }
 
@@ -28,7 +28,7 @@ describe("Apartment Contract Tests", function(){
             const {apartment, owner, randomUser} = await loadFixture(fixture);
             
             const tx = await apartment.connect(owner).
-            addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
+            addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"), owner.address);
 
             await tx.wait;
 
@@ -41,7 +41,7 @@ describe("Apartment Contract Tests", function(){
         const {apartment, owner, randomUser} = await loadFixture(fixture);
             
         const tx = await apartment.connect(owner).
-        addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
+        addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"), owner.address);
 
         await tx.wait;
 
@@ -56,7 +56,7 @@ describe("Apartment Contract Tests", function(){
 
         const {apartment, owner, randomUser} = await loadFixture(fixture);
 
-        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
+        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"), owner.address);
         await tx.wait;
         await expect(tx).to.emit(apartment, "apartmentAdded");
 
@@ -97,9 +97,9 @@ describe("Apartment Contract Tests", function(){
 
         // create apartment
 
-        const {apartment, owner, randomUser} = await loadFixture(fixture);
+        const {apartment, owner, randomUser, aptNFT} = await loadFixture(fixture);
         
-        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"));
+        const tx = await apartment.connect(owner).addApartment("QmWxHNvPBRV1hf1zkFoAczMAqiXUMrZaCqiGPH3W17mrwN", ethers.parseEther("150"), owner.address);
         await tx.wait();
 
         await expect(tx).to.emit(apartment, "apartmentAdded");
@@ -108,7 +108,7 @@ describe("Apartment Contract Tests", function(){
 
         await expect(
             apartment.connect(randomUser).deleteApartment(0)
-        ).to.be.revertedWithCustomError(apartment,"userNotAuthorized").withArgs(randomUser.address);
+        ).to.be.revertedWith("The contract is not authorized to burn the NFT");
         
         // Trying to delete an apartment which is not created
 
@@ -118,13 +118,14 @@ describe("Apartment Contract Tests", function(){
 
         // The owner of an apartment wants to remove it
 
-        const aptInfo = await apartment.getApartmentInfo(0);
-        
+        const nftTokenId = await apartment.getApartmentNftTokenID(0);
+        await aptNFT.connect(owner).approve(apartment.target, nftTokenId);
+
         const delApartment = await apartment.connect(owner).deleteApartment(0);
         await delApartment.wait();
 
         await expect(delApartment).to.emit(apartment, "apartmentDeleted").withArgs(
-            aptInfo.nftTokenId, 0
+            nftTokenId, 0
         );
 
     })

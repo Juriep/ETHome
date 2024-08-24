@@ -24,6 +24,7 @@ contract ListAndSellApartment is IERC721Receiver{
     event NFTReceived(address from, address to, uint256 tokenId, bytes data);
     event FallbackCalled(address sender, uint256 value, bytes data);
     event EtherReceived(address sender, uint256 value);
+    event apartmentRemoved(uint256 apartmentID);
 
     constructor(address _aptDeployedAddress, address _aptNFTDeployedAddress, address _userDeployedAddress)
     {
@@ -75,11 +76,7 @@ contract ListAndSellApartment is IERC721Receiver{
 
     function listApartmentForSale(string memory _IPFSHash, uint256 _ethPrice) external ifUserExist()
     {
-        
-        apartment.addApartment(_IPFSHash, _ethPrice);
-
-        aptNFT.setApprovalForAll(address(this), true);
-
+        apartment.addApartment(_IPFSHash, _ethPrice, msg.sender);
     }
 
     // When an apartment is listed, the addApartment method emit an event 
@@ -94,7 +91,11 @@ contract ListAndSellApartment is IERC721Receiver{
 
         address owner = aptNFT.getNftOwner(nftToken);
 
-        aptNFT.approve(msg.sender, nftToken);
+        // **Check if this contract has approval to transfer the NFT**
+        require(
+            aptNFT.getApproved(nftToken) == address(this),
+            "The contract is not authorized to transfer the NFT"
+        );
 
         aptNFT.transferFrom(owner, msg.sender, nftToken);
 
@@ -105,9 +106,9 @@ contract ListAndSellApartment is IERC721Receiver{
     }
 
     function removeApartment(uint256 _apartmentID) public ifUserExist()
-    onlyOwner(_apartmentID)
-    {
+    { 
         apartment.deleteApartment(_apartmentID);
+        emit apartmentRemoved(_apartmentID);
     }
 
     // Fallback function to handle unrecognized function calls

@@ -13,7 +13,6 @@ contract Apartment{
     event apartmentUpdated(uint256 apartmentID, uint256 nftTokenId, string ipfsHash, uint256 ethPrice);
     event apartmentDeleted(uint256 ntfTokenID, uint256 apartmentId);
     
-    
     enum apartmentStatus{
         Vacant, Occupied
     }
@@ -29,7 +28,6 @@ contract Apartment{
     apartmentNFT public aptNFT;
     mapping (uint256 => apartmentInfo) public apartments;
     uint256 public apartmentCounter = 0;
-
 
     // the constructor receive the apartmentNFT deploy address
     constructor(address apartmentNFTDeployedAddress) {
@@ -73,22 +71,21 @@ contract Apartment{
         return apartments[_apartmentID].ethPrice;
     }
 
-    
-    function addApartment(string memory _ipfsHash, uint256 _ethPrice) public 
+    function addApartment(string memory _ipfsHash, uint256 _ethPrice, address _owner) public
     {
         uint256 newApartmentID = apartmentCounter;
 
         // mint an NFT for this new apartment
 
-        uint256 nftTokenId = aptNFT.mintApartmentNFT(msg.sender, _ipfsHash);
+        uint256 nftTokenId = aptNFT.mintApartmentNFT(_owner, _ipfsHash);
 
         // store apartment info with IPFS and nftTokenID
 
-        apartments[newApartmentID] = apartmentInfo(_ipfsHash, nftTokenId, msg.sender, _ethPrice);
+        apartments[newApartmentID] = apartmentInfo(_ipfsHash, nftTokenId, _owner, _ethPrice);
 
         apartmentCounter++;
 
-        emit apartmentAdded(newApartmentID, nftTokenId, _ipfsHash, msg.sender, _ethPrice);
+        emit apartmentAdded(newApartmentID, nftTokenId, _ipfsHash, _owner, _ethPrice);
 
     }
 
@@ -107,8 +104,16 @@ contract Apartment{
     }
 
     function deleteApartment(uint256 _apartmentID) public checkApartmentExistance(_apartmentID)
-    onlyOwner(_apartmentID)
     {
+
+        uint256 nftToken = apartments[_apartmentID].nftTokenId;
+
+        // **Check if this contract has approval to burn the NFT**
+        require(
+            aptNFT.getApproved(nftToken) == address(this),
+            "The contract is not authorized to burn the NFT"
+        );
+
         aptNFT.burnNFT(apartments[_apartmentID].nftTokenId);
         emit apartmentDeleted(apartments[_apartmentID].nftTokenId, _apartmentID);
         delete apartments[_apartmentID]; 

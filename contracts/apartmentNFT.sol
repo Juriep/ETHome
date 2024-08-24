@@ -26,6 +26,9 @@ contract apartmentNFT is ERC721URIStorage {
 
     function burnNFT(uint256 _nftTokenID) external
     {
+        require(getApproved(_nftTokenID) == msg.sender,
+            "Caller is not owner nor approve" 
+        );
         _burn(_nftTokenID);
     }
 
