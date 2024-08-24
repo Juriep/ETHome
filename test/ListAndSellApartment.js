@@ -84,7 +84,16 @@ describe("List and sell apartment contract tests", function(){
         );
         await apartmentListingTx.wait();
 
+        await expect(apartmentListingTx).to.emit(apartment, "apartmentAdded");
+
+        // Then the user must approve the contract to transfer the NFT whenever a new
+        // for it to be tranfer to a buyer whenever him/her arrives
         
+        const nftTokenId = await apartment.getApartmentNftTokenID(0);
+
+        await aptNFT.connect(owner).approve(listAndSellApartment.target, nftTokenId);
+
+
         // Now the random user who wants to buy the apartment created above must be
         // registered too, otherwise the buy transaction will be reverted
 
@@ -110,14 +119,6 @@ describe("List and sell apartment contract tests", function(){
         await expect(
             listAndSellApartment.connect(randomUser).buyApartment(0, { value: ethers.parseEther("149")})
         ).to.be.revertedWithCustomError(listAndSellApartment, "NotEnoughEther").withArgs(ethers.parseEther("149"));
-
-
-        // Before Buying the apartment, the owner of the NFT must approve the contract
-        // to manage the specific NFT to be sold
-
-        const nftTokenId = await apartment.getApartmentNftTokenID(0);
-
-        await aptNFT.connect(owner).approve(listAndSellApartment.target, nftTokenId);
 
         // Now lets buy the apartment
 
