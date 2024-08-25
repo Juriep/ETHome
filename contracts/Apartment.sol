@@ -9,13 +9,12 @@ error userNotAuthorized(address _user);
 
 contract Apartment{
 
+    // Event methods
+
     event apartmentAdded(uint256 apartmentID, uint256 nftTokenID, string ipfsHash, address owner, uint256 ethPrice);
     event apartmentUpdated(uint256 apartmentID, uint256 nftTokenId, string ipfsHash, uint256 ethPrice);
     event apartmentDeleted(uint256 ntfTokenID, uint256 apartmentId);
-    
-    enum apartmentStatus{
-        Vacant, Occupied
-    }
+
 
     struct apartmentInfo
     {
@@ -53,6 +52,8 @@ contract Apartment{
         return apartments[_apartmentID].owner;
     }
 
+    // This method returns a boolena indicating if an apartment exist or not
+
     function apartmentExists(uint256 _apartmentID) public view returns (bool)
     {
         if(apartments[_apartmentID].owner != address(0))
@@ -61,15 +62,21 @@ contract Apartment{
             return false;
     }
 
+    // This method returns the apartment NFT token ID
+
     function getApartmentNftTokenID(uint256 _apartmentID) public view returns(uint256)
     {
         return apartments[_apartmentID].nftTokenId;
     }
 
+    // This method returns how much Ether the apartment is value
+
     function getApartmentEthPrice(uint256 _apartmentID) public view returns(uint256)
     {
         return apartments[_apartmentID].ethPrice;
     }
+
+    // Create a new apartment
 
     function addApartment(string memory _ipfsHash, uint256 _ethPrice, address _owner) public
     {
@@ -89,11 +96,15 @@ contract Apartment{
 
     }
 
+    // Read the information of an specific apartment
+
     function getApartmentInfo(uint256 _apartmentID) public view
     checkApartmentExistance(_apartmentID) returns (apartmentInfo memory)
     {
         return apartments[_apartmentID];
     }
+
+    // Update the apartment parameters, IPFS string, price and more
 
     function updateApartmentParams(uint256 _apartmentID, string memory _newIpfsHash, uint256 _ethPrice)
     public checkApartmentExistance(_apartmentID) onlyOwner(_apartmentID)
@@ -102,6 +113,8 @@ contract Apartment{
         emit apartmentUpdated(_apartmentID, apartments[_apartmentID].nftTokenId,
         _newIpfsHash, _ethPrice);
     }
+
+    // delete apartment method, this also burn the apartment NFT
 
     function deleteApartment(uint256 _apartmentID) public checkApartmentExistance(_apartmentID)
     {
