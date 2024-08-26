@@ -10,5 +10,7 @@ contracts folder: Here you can find all the contracts developed for the project.
 
 test folder: In this folder are stored the Hardhat test files which ensures the correct working of each method of all the contracts.
 
+ethome-dapp folder: Here is the React app for the user to interact with the contracts.
+
 Feel free to help improve the project as I am on my way to becoming a blockchain developer.
 
