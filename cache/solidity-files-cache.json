@@ -81,8 +81,8 @@
       ]
     },
     "C:\\Users\\sebas\\OneDrive\\Documentos\\Blockchain\\ETHome\\contracts\\Apartment.sol": {
-      "lastModificationDate": 1724543036526,
-      "contentHash": "004ff4b58a6105697d5444a1d213a9fa",
+      "lastModificationDate": 1724544086144,
+      "contentHash": "00256e0e6838cd8d0605ce87aad39dd2",
       "sourceName": "contracts/Apartment.sol",
       "solcConfig": {
         "version": "0.8.20",
