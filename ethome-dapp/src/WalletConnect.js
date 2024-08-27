@@ -34,7 +34,7 @@ const WalletConnect = () => {
             catch(error)
             {
                 // Handle errors if the wallet connection fails
-                console.error("Failed to connect wallet: ", error);
+                alert("Failed to connect wallet");
             }
 
         }
@@ -47,12 +47,23 @@ const WalletConnect = () => {
     };
 
     return (
-        <div>
-          <button onClick={connectWallet}>Connect Wallet</button>
-          {account && <p>Connected Account: {account}</p>}
-        </div>
+        <button style={styles.connectButton} onClick={connectWallet}>
+            Connect Wallet
+        </button>
     );
 
 }
+// Button styling for consistency
+const styles = {
+  connectButton: {
+    backgroundColor: "#28a745",
+    color: "white",
+    padding: "20px 40px",
+    fontSize: "18px",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+};
 
 export default WalletConnect;
