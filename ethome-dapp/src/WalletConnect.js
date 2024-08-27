@@ -1,69 +1,104 @@
-import React, {useState} from "react";
-const {ethers} = require("ethers");
+import React, { useState, useEffect } from "react";
+const { ethers } = require("ethers");
 
-const WalletConnect = () => {
-
+const WalletConnect = ({ onAccountChange }) => {
     const [account, setAccount] = useState(null);
 
-    const connectWallet = async () => {
-
-        if(typeof window.ethereum !== 'undefined') // Check if MetaMask is installed
-        {
-            
-            try
-            {
-
-                // Prompt user for account connections
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
-                // Create a new provider instance using ethers.js
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-                // Get the signer instance from the provider
-                const signer = provider.getSigner(); 
-
-                // Fetch the user's Ethereum address
-                const userAddress = await signer.getAddress();
-
-                // Save the user's Ethereum address to the state
-                setAccount(userAddress); 
-
-                console.log("Connected account: ", userAddress);
-
+    useEffect(() => {
+        // Function to handle account changes
+        const handleAccountsChanged = (accounts) => {
+            if (accounts.length > 0) {
+                setAccount(accounts[0]); // Update the state with the new account
+                onAccountChange(accounts[0]); // Notify parent component of the new account
+            } else {
+                setAccount(null); // Clear the state if no accounts are available
+                onAccountChange(null); // Notify parent component that no account is connected
             }
-            catch(error)
-            {
-                // Handle errors if the wallet connection fails
+        };
+    
+        // Check if MetaMask is available
+        if (typeof window.ethereum !== 'undefined') {
+            // Set up an event listener for account changes
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
+        }
+    
+        // Cleanup function to remove the event listener
+        return () => {
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+            }
+        };
+    }, [onAccountChange]);
+    
+    const connectWallet = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("Accounts retrieved:", accounts);
+                
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const userAddress = await signer.getAddress();
+                console.log("User address:", userAddress);
+                
+                if (accounts[0].toLowerCase() === userAddress.toLowerCase()) {
+                    setAccount(userAddress);
+                    onAccountChange(userAddress);
+                    console.log("Connected account:", userAddress);
+                } else {
+                    throw new Error("Account mismatch between MetaMask and ethers.js");
+                }
+            } catch (error) {
+                console.error("Error connecting wallet:", error);
                 alert("Failed to connect wallet");
             }
-
+        } else {
+            alert("MetaMask is not installed.");
         }
-
-        else
-        {
-            alert("Metamask is not installed.") // Inform the user that MetaMask is not installed
-        }
-
     };
+    
+    const disconnectWallet = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_revokePermissions',
+                    params: [{
+                        eth_accounts: {}
+                    }]
+                });
+                console.log("Permissions revoked");
+    
+                setAccount(null);
+                onAccountChange(null);
+    
+                alert("You have been disconnected from MetaMask.");
+            } catch (error) {
+                console.error("Error revoking permissions:", error);
+                alert("Failed to disconnect wallet. Please manually disconnect from MetaMask.");
+            }
+        } else {
+            alert("MetaMask is not installed.");
+        }
+    };
+    
 
     return (
-        <button style={styles.connectButton} onClick={connectWallet}>
-            Connect Wallet
+        <button style={styles.connectButton} onClick={account ? disconnectWallet : connectWallet}>
+            {account ? `Connected: ${account.slice(0, 6)}...${account.slice(-4)}` : "Connect Wallet"}
         </button>
     );
+};
 
-}
-// Button styling for consistency
 const styles = {
-  connectButton: {
-    backgroundColor: "#28a745",
-    color: "white",
-    padding: "20px 40px",
-    fontSize: "18px",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-  },
+    connectButton: {
+        backgroundColor: "#28a745",
+        color: "white",
+        padding: "15px 30px",
+        fontSize: "15px",
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer",
+    },
 };
 
 export default WalletConnect;
