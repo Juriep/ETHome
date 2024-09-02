@@ -2,36 +2,39 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-  }
-  
-  .canvas-container {
+}
+
+.canvas-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-  }
-  
-  .main-content {
+}
+
+.main-content {
     position: relative;
     z-index: 1;
     padding: 32px;
-  }
-  
-  .header {
+    min-height: 100vh; /* Ensure the content container takes up at least the viewport height */
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 64px;
-  }
-  
-  .title {
+    margin-bottom: 32px; /* Adjusted margin for better spacing */
+}
+
+.title {
     color: #38a169;
     font-size: 48px;
     font-weight: bold;
-  }
-  
-  .button {
+}
+
+.button {
     background-color: #38a169;
     color: white;
     padding: 10px 20px;
@@ -41,23 +44,96 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
-  }
-  
-  .button:hover {
+}
+
+.button:hover {
     background-color: #2f855a;
-  }
-  
-  .list-apartment-button {
+}
+
+.list-apartment-button {
     display: flex;
     justify-content: center;
-    margin-bottom: 64px; /* Adjust this value to match the spacing with other elements */
-  }
-  
-  .apartment-grid {
+    margin-bottom: 32px; /* Adjusted margin for better spacing */
+}
+
+.apartment-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* Increased min width */
     gap: 32px;
-    max-height: 80vh; /* Adjust height as needed */
     overflow-y: auto; /* Enables vertical scrolling */
-  }
-  
+    max-height: calc(100vh - 300px); /* Adjust based on the height of header and other fixed elements */
+}
+
+.apartment-card {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #38a169;
+    width: 430px; /* Increased width */
+    height: 430px; /* Increased height */
+    position: relative; /* Required for absolute positioning of the button */
+    padding: 16px; /* Added padding for spacing */
+    box-sizing: border-box; /* Ensures padding is included in width/height */
+}
+
+.apartment-card img {
+    width: 100%;
+    height: 250px; /* Increased height for images */
+    object-fit: cover;
+}
+
+.apartment-card .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.apartment-card h3 {
+    color: white;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.apartment-card p {
+    color: #d1d5db;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.price-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.price-container h3 {
+    margin: 0; /* Remove default margin */
+    margin-right: 13px; /* Space between label and value */
+    display: inline; /* Ensures the label stays inline with the value */
+}
+
+.price-container .price-value {
+    margin: 0; /* Remove default margin */
+    color: #38a169;
+    font-weight: bold;
+}
+
+.buy-button {
+    background-color: #38a169;
+    color: white;
+    padding: 13px 100px; /* Adjusted padding for a larger button */
+    border-radius: 9999px;
+    border: none;
+    font-size: 21px; /* Increased font size */
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    align-self: center; /* Center the button horizontally */
+    margin-top: auto; /* Ensure the button stays at the bottom */
+}
+
+.buy-button:hover {
+    background-color: #2f855a;
+}
