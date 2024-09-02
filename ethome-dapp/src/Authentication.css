@@ -1,0 +1,189 @@
+/* Authentication.css */
+
+/* General reset for body and html */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: black; /* Ensure the background remains black */
+}
+
+/* Ensure the canvas covers the entire screen */
+canvas {
+    position: absolute;  /* Absolute positioning to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;  /* Lower z-index so it's behind all other content */
+    pointer-events: none;  /* Ensure the canvas does not interfere with clicks */
+}
+
+/* Main container styles */
+.relative {
+    position: relative;
+    z-index: 1; /* Ensure content is above the canvas */
+}
+
+.h-screen {
+    height: 100vh;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Spacing adjustments */
+.mt-12 {
+    margin-top: 0; /* Set to 0 to remove the gap */
+}
+
+.mt-20 {
+    margin-top: 8rem; /* Adjust this value as needed for the desired spacing */
+}
+
+.mt-22 {
+    margin-top: 3rem; /* Adjust this value as needed for the desired spacing */
+}
+
+.mb-8 {
+    margin-bottom: 6rem; /* Increased vertical margin for more spacing */
+}
+
+/* Additional spacing for buttons */
+.mt-16 { /* Margin-top for button container */
+    margin-top: 7rem; /* Adjust this value as needed for the desired vertical spacing */
+}
+
+.mb-16 {
+    margin-bottom: 5rem; /* Adjust this value as needed for the desired vertical spacing */
+}
+
+/* Flexbox centering styles */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+/* Flexbox gap for buttons */
+.gap-8 {
+    gap: 10rem; /* Adjust this value for desired horizontal spacing */
+}
+
+/* Background colors and text colors */
+.bg-black {
+    background-color: black;
+}
+
+.text-green-500 {
+    color: #38a169; /* Green color */
+}
+
+.text-gray-300 {
+    color: #d1d5db; /* Light gray color */
+}
+
+.text-6xl {
+    font-size: 5rem; /* Increased font size for the title */
+}
+
+.text-xl {
+    font-size: 2.5rem; /* Increased font size for the description */
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+/* Button styles */
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.bg-green-500 {
+    background-color: #38a169; /* Green background */
+}
+
+.px-8 {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.py-3 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.text-lg {
+    font-size: 1.5rem; /* Increased font size for button text */
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.text-white {
+    color: white;
+}
+
+.transition-all {
+    transition: all 0.3s;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+/* Hover and focus states */
+.hover\:bg-green-400:hover {
+    background-color: #48bb78; /* Lighter green */
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0.7);
+}
+
+.focus\:outline-none:focus {
+    outline: none;
+}
+
+.focus\:ring-2:focus {
+    box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.5); /* Focus ring */
+}
+
+.focus\:ring-green-400:focus {
+    border-color: #48bb78; /* Focus border */
+}
+
+.focus\:ring-offset-2:focus {
+    box-shadow: 0 0 0 4px rgba(72, 187, 120, 0.5); /* Offset ring */
+}
+
+.focus\:ring-offset-black:focus {
+    box-shadow: 0 0 0 4px black; /* Offset background */
+}
+
+/* Rectangle container for description and list */
+.text-container {
+    background-color: black; /* Black background to cover stars */
+    padding: 0rem; /* Adjust padding as needed */
+    border-radius: 0rem; /* Optional: rounded corners */
+    z-index: 1; /* Ensure it's above the canvas */
+}

@@ -1,85 +1,135 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./HomePage.css"; // Import the CSS file for star animations
-import generateStars from "./GenerateStars"; // Correct import for the default export
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import "./UserRegistration.css"; // Import the CSS file for styles
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 const UserRegistration = () => {
-    const navigate = useNavigate();
-    const [stars, setStars] = useState([]); // State for stars in the background
+  const canvasRef = useRef(null); // Reference to the canvas element
+  const [username, setUsername] = useState(""); // State for username input
+  const [age, setAge] = useState(""); // State for age input
+  const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
 
-    useEffect(() => {
-        setStars(generateStars(1000)); // Generate stars
-    }, []);
+  // Initialize stars and animation on component mount
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-    const handleRegisterClick = () => {
-        navigate("/register");
+    const stars = []; // Array to hold star objects
+
+    // Resize the canvas to fill the window
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initStars();
     };
 
-    return (
-        <div style={styles.container}>
-            <div className="stars-background">
-                {stars.map((star) => (
-                    <div
-                        key={star.key}
-                        className="star"
-                        style={{
-                            width: star.size,
-                            height: star.size,
-                            top: star.top,
-                            left: star.left,
-                            animationDuration: star.animationDuration,
-                            animationDelay: star.animationDelay,
-                        }}
-                    />
-                ))}
-            </div>
-            <div style={styles.content}>
-                <h1 style={styles.title}>ETHome</h1>
-                <p style={styles.subtitle}>Please register your account</p>
-                <button style={styles.button} onClick={handleRegisterClick}>Register</button>
-            </div>
-        </div>
-    );
-};
+    // Initialize star positions and sizes
+    const initStars = () => {
+      stars.length = 0; // Clear existing stars
+      for (let i = 0; i < 350; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2,
+          speedX: Math.random() * 0.1, // Random speed for X axis
+          speedY: Math.random() * 0.1, // Random speed for Y axis
+        });
+      }
+    };
 
-const styles = {
-    container: {
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        backgroundColor: "black",
-        overflow: "hidden",
-    },
-    content: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-    },
-    button: {
-        backgroundColor: "#28a745",
-        color: "white",
-        padding: "15px 30px",
-        fontSize: "20px",
-        border: "none",
-        borderRadius: "15px",
-        cursor: "pointer",
-    },
-    title: {
-        fontSize: "64px",
-        color: "#28a745",
-        textAlign: "center",
-    },
-    subtitle: {
-        fontSize: "25px",
-        color: "white",
-        textAlign: "center",
-        marginTop: "20px",
+    // Draw the stars on the canvas
+    const drawStars = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      stars.forEach((star) => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Update star position for random movement
+        star.x += star.speedX;
+        star.y += star.speedY;
+
+        // If star moves out of bounds, reposition it to the opposite side
+        if (star.x < 0) star.x = canvas.width;
+        if (star.x > canvas.width) star.x = 0;
+        if (star.y < 0) star.y = canvas.height;
+        if (star.y > canvas.height) star.y = 0;
+      });
+    };
+
+    // Animation loop
+    const animate = () => {
+      drawStars();
+      requestAnimationFrame(animate);
+    };
+
+    resizeCanvas(); // Initial canvas setup
+    animate(); // Start animation
+
+    // Handle window resize
+    window.addEventListener("resize", resizeCanvas);
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, []);
+
+  // Handle registration and navigation
+  const handleRegisterClick = () => {
+    if (!username || !age) {
+      alert("Please fill in both fields.");
+      return;
     }
+
+    alert(`Welcome ${username}`);
+
+    setTimeout(() => {
+      navigate("/Home");
+    }, 100); // Redirect after 1 second
+  };
+
+  // Handle age input to restrict to numbers only
+  const handleAgeChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setAge(value);
+    }
+  };
+
+  return (
+    <div className="relative h-screen w-full overflow-hidden bg-black">
+      {/* Canvas for starry background */}
+      <canvas ref={canvasRef} className="absolute inset-0" />
+
+      {/* Main content */}
+      <div className="relative z-10 flex h-full flex-col items-center justify-center">
+        <h1 className="text-green-500 text-6xl font-bold mb-12 mt-20">ETHome</h1>
+        <div className="text-container flex flex-col items-center">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="input-field mb-6 input-separation" // Apply input-separation class here
+          />
+          <input
+            type="text"
+            placeholder="Age"
+            value={age}
+            onChange={handleAgeChange}
+            className="input-field"
+          />
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="hover-shadow rounded-full bg-green-500 px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black mt-10"
+          onClick={handleRegisterClick}
+        >
+          Register
+        </motion.button>
+      </div>
+    </div>
+  );
 };
 
 export default UserRegistration;

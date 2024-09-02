@@ -1,0 +1,207 @@
+/* UserRegistration.css */
+
+/* Ensure the background remains black */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: black;
+}
+
+/* Ensure the canvas covers the entire screen */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Main container styles */
+.relative {
+    position: relative;
+    z-index: 1;
+}
+
+.h-screen {
+    height: 100vh;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.mt-12 {
+    margin-top: 0;
+}
+
+.z-10 {
+    z-index: 10;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.bg-black {
+    background-color: black;
+}
+
+/* Text and font size styles */
+.text-green-500 {
+    color: #38a169; /* Green color */
+}
+
+.text-gray-300 {
+    color: #d1d5db; /* Light gray color */
+}
+
+.text-6xl {
+    font-size: 5rem;
+}
+
+.text-xl {
+    font-size: 2rem;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+/* Spacing adjustments for centering */
+.mb-8 {
+    margin-bottom: 6rem;
+}
+
+.mt-10 {
+    margin-top: 5.3rem;
+}
+
+.mb-12 {
+    margin-bottom: 4rem;
+}
+
+.mt-20 {
+    margin-top: 9rem;
+}
+
+/* Input field styles */
+.input-field {
+    background-color: black; /* Dark background */
+    color: #fff; /* White text */
+    border: 2px solid #38a169; /* Green border */
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    width: 130%;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+/* Remove number input arrows in modern browsers */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+/* Button styles */
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.bg-green-500 {
+    background-color: #38a169;
+}
+
+.px-8 {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.py-3 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.text-lg {
+    font-size: 1.5rem;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.text-white {
+    color: white;
+}
+
+.transition-all {
+    transition: all 0.3s;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+/* Hover and focus states */
+.hover\:bg-green-400:hover {
+    background-color: #48bb78;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0.7);
+}
+
+.focus\:outline-none:focus {
+    outline: none;
+}
+
+.focus\:ring-2:focus {
+    box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.5);
+}
+
+.focus\:ring-green-400:focus {
+    border-color: #48bb78;
+}
+
+.focus\:ring-offset-2:focus {
+    box-shadow: 0 0 0 4px rgba(72, 187, 120, 0.5);
+}
+
+.focus\:ring-offset-black:focus {
+    box-shadow: 0 0 0 4px black;
+}
+
+/* Rectangle container for description */
+.text-container {
+    background-color: black;
+    padding: 0rem;
+    border-radius: 0rem;
+    z-index: 1;
+}
+
+/* Additional spacing class */
+.input-separation {
+    margin-bottom: 1rem; /* Adjust this value to increase or decrease the spacing */
+}

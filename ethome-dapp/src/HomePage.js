@@ -1,57 +1,103 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import generateStars from "./GenerateStars"; // Correct import for the default export
-import "./HomePage.css";
-import { connectWallet, disconnectWallet } from "./WalletConnectionUtils";
+import { useEffect, useRef, useState } from "react"
+import ApartmentCard from "./ApartmentCard"
+import './HomePage.css'; // Import the updated CSS
 
-const HomePage = () => {
-    const [stars, setStars] = useState([]); // State for stars in the background
-    const [account, setAccount] = useState(null); // State for connected account
-    const navigate = useNavigate(); // Hook for navigation
+export default function Component() {
+  const canvasRef = useRef(null)
+  const [apartments, setApartments] = useState([])
 
-    // Handle account change
-    const handleAccountChange = (newAccount) => {
-        setAccount(newAccount);
-    };
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
+    if (!canvas || !ctx) return
 
-    // Generate random stars for the background
-    useEffect(() => {
-        setStars(generateStars(1000)); // Adjust number of stars as needed
-    }, []);
+    const stars = []
 
-    return (
-        <div className="page-container">
-            <div className="stars-background">
-                {stars.map((star) => (
-                    <div
-                        key={star.key}
-                        className="star"
-                        style={{
-                            width: star.size,
-                            height: star.size,
-                            top: star.top,
-                            left: star.left,
-                            animationDuration: star.animationDuration,
-                            animationDelay: star.animationDelay,
-                        }}
-                    />
-                ))}
-            </div>
-            <div className="content">
-                <h1 className="title">ETHome</h1>
-                <p className="description">Please connect your wallet to proceed into the Dapp</p>
-                <button
-                    className="connect-button"
-                    onClick={account ? () => disconnectWallet(handleAccountChange) : () => connectWallet(handleAccountChange)}
-                >
-                    {account
-                        ? `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`
-                        : "Connect Wallet"
-                    }
-                </button>
-            </div>
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      initStars()
+    }
+
+    const initStars = () => {
+      stars.length = 0
+      for (let i = 0; i < 350; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2,
+          speedX: Math.random() * 0.1,
+          speedY: Math.random() * 0.1,
+        })
+      }
+    }
+
+    const drawStars = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = "white"
+      stars.forEach((star) => {
+        ctx.beginPath()
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
+        ctx.fill()
+
+        star.x += star.speedX
+        star.y += star.speedY
+
+        if (star.x < 0) star.x = canvas.width
+        if (star.x > canvas.width) star.x = 0
+        if (star.y < 0) star.y = canvas.height
+        if (star.y > canvas.height) star.y = 0
+      })
+    }
+
+    const animate = () => {
+      drawStars()
+      requestAnimationFrame(animate)
+    }
+
+    resizeCanvas()
+    animate()
+
+    window.addEventListener("resize", resizeCanvas)
+    return () => window.removeEventListener("resize", resizeCanvas)
+  }, [])
+
+  const handleListApartment = () => {
+    const newApartment = {
+      image: "/placeholder.svg?height=200&width=300",
+      description: "New apartment listing",
+      price: "X ETH",
+    }
+    setApartments([...apartments, newApartment])
+  }
+
+  return (
+    <div style={{ position: 'relative', minHeight: '100vh', width: '100%', overflow: 'hidden', backgroundColor: 'black' }}>
+      <canvas ref={canvasRef} className="canvas-container" />
+
+      <div className="main-content">
+        <div className="header">
+          <h1 className="title">ETHome</h1>
+          <button className="button">
+            Connect Wallet
+          </button>
         </div>
-    );
-};
 
-export default HomePage;
+        <div className="list-apartment-button">
+          <button
+            className="button"
+            onClick={handleListApartment}
+          >
+            List apartment for sale
+          </button>
+        </div>
+
+        <div className="apartment-grid">
+          {apartments.map((apt, index) => (
+            <ApartmentCard key={index} {...apt} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,92 +1,63 @@
 body {
     margin: 0;
-    overflow: hidden;
-    background: black;
-}
-
-.page-container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: black;
-}
-
-.stars-background {
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+  }
+  
+  .canvas-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    pointer-events: none; 
-}
-
-.star {
-    position: absolute;
-    border-radius: 50%;
-    background: white;
-    opacity: 0.8;
-    pointer-events: none; 
-    animation: moveStars linear infinite;
-}
-
-@keyframes moveStars {
-    0% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(calc(200vw), calc(200vh));
-    }
-}
-
-@media (min-width: 1200px) {
-    .star {
-        width: 2px;
-        height: 2px;
-    }
-}
-
-@media (max-width: 1199px) {
-    .star {
-        width: 1px;
-        height: 1px;
-    }
-}
-
-.content {
+  }
+  
+  .main-content {
     position: relative;
     z-index: 1;
-    text-align: center;
+    padding: 32px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 64px;
+  }
+  
+  .title {
+    color: #38a169;
+    font-size: 48px;
+    font-weight: bold;
+  }
+  
+  .button {
+    background-color: #38a169;
     color: white;
-}
-
-.title {
-    font-size: 64px;
-    color: #28a745;
-    margin: 0;
-    padding-top: 25vh;
-}
-
-.description {
-    font-size: 25px;
-    margin: 20px 0;
-    padding-top: 10vh;
-    padding-bottom: 10vh;
-}
-
-.connect-button {
-    background-color: #28a745;
-    color: white;
-    padding: 15px 70px;
-    font-size: 20px;
+    padding: 10px 20px;
+    border-radius: 9999px;
     border: none;
-    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.connect-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 10px gold;
-}
+    transition: background-color 0.3s;
+  }
+  
+  .button:hover {
+    background-color: #2f855a;
+  }
+  
+  .list-apartment-button {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 64px; /* Adjust this value to match the spacing with other elements */
+  }
+  
+  .apartment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 32px;
+    max-height: 80vh; /* Adjust height as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+  }
+  
