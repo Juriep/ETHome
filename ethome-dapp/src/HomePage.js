@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";  // Import useNavigate from react-router-dom
 import ApartmentCard from "./ApartmentCard";
 import './HomePage.css'; // Import the CSS file
 
 export default function Component() {
   const canvasRef = useRef(null);
   const [apartments, setApartments] = useState([]);
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,12 +65,8 @@ export default function Component() {
   }, []);
 
   const handleListApartment = () => {
-    const newApartment = {
-      image: "/placeholder.svg?height=200&width=300",
-      description: "New apartment listing",
-      price: "X ETH",
-    };
-    setApartments([...apartments, newApartment]);
+    // Navigate to the /listApartment route
+    navigate("/listApartment");
   };
 
   return (
