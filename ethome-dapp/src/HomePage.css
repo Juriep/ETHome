@@ -102,6 +102,26 @@ body {
     margin-bottom: 8px;
 }
 
+.description-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Adjusted margin for spacing */
+}
+
+.description-container .label {
+    color: white;
+    font-weight: bold;
+    margin: 0;
+    margin-right: 8px; /* Space between label and text */
+}
+
+.description-container .description {
+    color: #d1d5db;
+    font-size: 14px;
+    margin: 0; /* Remove default margin */
+    flex: 1; /* Allows description text to take up remaining space */
+}
+
 .price-container {
     display: flex;
     align-items: center;
@@ -110,8 +130,8 @@ body {
 
 .price-container h3 {
     margin: 0; /* Remove default margin */
-    margin-right: 13px; /* Space between label and value */
-    display: inline; /* Ensures the label stays inline with the value */
+    margin-right: 8px; /* Space between label and value */
+    color: white; /* Set label color */
 }
 
 .price-container .price-value {

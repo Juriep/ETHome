@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import "./ListApartment.css"; // Import the CSS file
+import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
 
-export default function Component() {
+export default function ListApartment() {
   const canvasRef = useRef(null);
   const [image, setImage] = useState(null);
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState(""); // State to store the price input value
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -71,12 +74,31 @@ export default function Component() {
     }
   };
 
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
+
   const handlePriceChange = (event) => {
     const value = event.target.value;
     // Only allow numbers and decimal points
     if (/^\d*\.?\d*$/.test(value)) {
       setPrice(value);
     }
+  };
+
+  const handleListApartment = () => {
+    const newApartment = {
+      id: Date.now(), // Generate a unique ID
+      image,
+      description,
+      price
+    };
+
+    // Save to local storage (or replace with your preferred state management method)
+    localStorage.setItem('newApartment', JSON.stringify(newApartment));
+
+    // Navigate to the /Home route
+    navigate("/Home");
   };
 
   return (
@@ -110,6 +132,8 @@ export default function Component() {
         <input
           type="text"
           placeholder="Description"
+          value={description}
+          onChange={handleDescriptionChange}
           className="input"
         />
 
@@ -123,7 +147,7 @@ export default function Component() {
           pattern="[0-9]*"   // Ensures only numbers are allowed
         />
 
-        <button className="button">
+        <button className="button" onClick={handleListApartment}>
           List apartment
         </button>
       </div>

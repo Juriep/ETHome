@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate from react-router-dom
+import { useNavigate } from "react-router-dom";
 import ApartmentCard from "./ApartmentCard";
 import './HomePage.css'; // Import the CSS file
 
-export default function Component() {
+export default function HomePage() {
   const canvasRef = useRef(null);
   const [apartments, setApartments] = useState([]);
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -64,9 +64,25 @@ export default function Component() {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
+  useEffect(() => {
+    // Retrieve new apartment data from local storage
+    const storedApartment = localStorage.getItem('newApartment');
+    if (storedApartment) {
+      const newApartment = JSON.parse(storedApartment);
+      setApartments((prevApartments) => {
+        // Check if the apartment already exists to avoid duplicates
+        const exists = prevApartments.some((apt) => apt.id === newApartment.id);
+        if (!exists) {
+          return [...prevApartments, newApartment];
+        }
+        return prevApartments;
+      });
+      localStorage.removeItem('newApartment'); // Clear the stored apartment data
+    }
+  }, []);
+
   const handleListApartment = () => {
-    // Navigate to the /listApartment route
-    navigate("/listApartment");
+    navigate("/listApartment"); // Navigate to the /listApartment route
   };
 
   return (
@@ -91,8 +107,8 @@ export default function Component() {
         </div>
 
         <div className="apartment-grid">
-          {apartments.map((apt, index) => (
-            <ApartmentCard key={index} {...apt} />
+          {apartments.map((apt) => (
+            <ApartmentCard key={apt.id} {...apt} />
           ))}
         </div>
       </div>
