@@ -1,13 +1,36 @@
 import { ethers } from 'ethers';
 
+// Check if a wallet is already connected
+export const checkWalletConnection = async (setAccount, handleAccountChange) => {
+    if (typeof window.ethereum !== 'undefined') {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const userAddress = await signer.getAddress();
+                
+                if (accounts[0].toLowerCase() === userAddress.toLowerCase()) {
+                    setAccount(userAddress);
+                    handleAccountChange(userAddress);
+                    console.log("Wallet already connected:", userAddress);
+                }
+            }
+        } catch (error) {
+            console.error("Error checking wallet connection:", error);
+        }
+    } else {
+        console.log("MetaMask is not installed.");
+    }
+};
+
+// Connect the wallet
 export const connectWallet = async (setAccount, handleAccountChange) => {
     if (typeof window.ethereum !== 'undefined') {
         try {
-            // Request account access
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             console.log("Accounts retrieved:", accounts);
 
-            // Create an ethers provider and signer
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             const userAddress = await signer.getAddress();
@@ -29,10 +52,10 @@ export const connectWallet = async (setAccount, handleAccountChange) => {
     }
 };
 
+// Disconnect the wallet
 export const disconnectWallet = async (setAccount, handleAccountChange) => {
     if (typeof window.ethereum !== 'undefined') {
         try {
-            // Request to revoke permissions (if supported)
             await window.ethereum.request({
                 method: 'wallet_revokePermissions',
                 params: [{ eth_accounts: {} }]

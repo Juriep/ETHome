@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import "./ListApartment.css"; // Import the CSS file
-import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+import { useNavigate } from "react-router-dom"; 
+import { checkWalletConnection, connectWallet, disconnectWallet } from './WalletConnectionUtils'; // Import wallet utilities
+import './ListApartment.css'; // Import the CSS file
 
 export default function ListApartment() {
   const canvasRef = useRef(null);
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(""); // State to store the price input value
+  const [account, setAccount] = useState(null); // State to store the connected wallet address
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
   useEffect(() => {
@@ -65,6 +67,13 @@ export default function ListApartment() {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
+  useEffect(() => {
+    // Check wallet connection on mount
+    checkWalletConnection(setAccount, (address) => {
+      console.log("Wallet connected:", address);
+    });
+  }, []);
+
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -89,16 +98,27 @@ export default function ListApartment() {
   const handleListApartment = () => {
     const newApartment = {
       id: Date.now(), // Generate a unique ID
-      image,
       description,
-      price
+      price,
+      image, // Image remains in the state, but we're not storing it in local storage
     };
 
-    // Save to local storage (or replace with your preferred state management method)
-    localStorage.setItem('newApartment', JSON.stringify(newApartment));
+    // Instead of saving to local storage, we pass the data via the React Router's state
+    navigate("/Home", { state: { newApartment } });
+  };
 
-    // Navigate to the /Home route
-    navigate("/Home");
+  const handleWalletButtonClick = async () => {
+    if (account) {
+      // If wallet is connected, disconnect
+      await disconnectWallet(setAccount, () => {
+        console.log("Wallet disconnected");
+      });
+    } else {
+      // If wallet is not connected, connect
+      await connectWallet(setAccount, (address) => {
+        console.log("Wallet connected:", address);
+      });
+    }
   };
 
   return (
@@ -110,7 +130,7 @@ export default function ListApartment() {
 
         <p className="paragraph">
           Please enter the following information to complete the apartment listing.
-          By clicking the "List apartment" button a new apartment ownership will be addressed to the
+          By clicking the "List apartment" button a new apartment ownership will be added to the
           wallet connected.
         </p>
 
@@ -150,6 +170,12 @@ export default function ListApartment() {
         <button className="button" onClick={handleListApartment}>
           List apartment
         </button>
+
+        <div className="wallet-section">
+          <button className="wallet-button" onClick={handleWalletButtonClick}>
+            {account ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}` : 'Connect Wallet'}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; 
+import { checkWalletConnection, connectWallet, disconnectWallet } from './WalletConnectionUtils'; // Import wallet utilities
 import ApartmentCard from "./ApartmentCard";
-import './HomePage.css'; // Import the CSS file
+import './HomePage.css'; 
 
 export default function HomePage() {
   const canvasRef = useRef(null);
   const [apartments, setApartments] = useState([]);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [account, setAccount] = useState(null); // State to store the connected wallet address
+  const navigate = useNavigate(); 
+  const location = useLocation(); 
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -65,24 +68,41 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    // Retrieve new apartment data from local storage
-    const storedApartment = localStorage.getItem('newApartment');
-    if (storedApartment) {
-      const newApartment = JSON.parse(storedApartment);
+    // Check wallet connection on mount
+    checkWalletConnection(setAccount, (address) => {
+      console.log("Wallet connected:", address);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (location.state && location.state.newApartment) {
+      const newApartment = location.state.newApartment;
       setApartments((prevApartments) => {
-        // Check if the apartment already exists to avoid duplicates
         const exists = prevApartments.some((apt) => apt.id === newApartment.id);
         if (!exists) {
           return [...prevApartments, newApartment];
         }
         return prevApartments;
       });
-      localStorage.removeItem('newApartment'); // Clear the stored apartment data
     }
-  }, []);
+  }, [location.state]); 
 
   const handleListApartment = () => {
-    navigate("/listApartment"); // Navigate to the /listApartment route
+    navigate("/listApartment");
+  };
+
+  const handleWalletButtonClick = async () => {
+    if (account) {
+      // If wallet is connected, disconnect
+      await disconnectWallet(setAccount, () => {
+        console.log("Wallet disconnected");
+      });
+    } else {
+      // If wallet is not connected, connect
+      await connectWallet(setAccount, (address) => {
+        console.log("Wallet connected:", address);
+      });
+    }
   };
 
   return (
@@ -92,8 +112,8 @@ export default function HomePage() {
       <div className="main-content">
         <div className="header">
           <h1 className="title">ETHome</h1>
-          <button className="button">
-            Connect Wallet
+          <button className="button" onClick={handleWalletButtonClick}>
+            {account ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}` : "Connect Wallet"}
           </button>
         </div>
 
