@@ -39,34 +39,6 @@ canvas {
     overflow: hidden;
 }
 
-.mt-12 {
-    margin-top: 0;
-}
-
-.z-10 {
-    z-index: 10;
-}
-
-.flex {
-    display: flex;
-}
-
-.flex-col {
-    flex-direction: column;
-}
-
-.items-center {
-    align-items: center;
-}
-
-.justify-center {
-    justify-content: center;
-}
-
-.bg-black {
-    background-color: black;
-}
-
 /* Text and font size styles */
 .text-green-500 {
     color: #38a169; /* Green color */
@@ -123,7 +95,6 @@ input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-
 
 /* Button styles */
 .rounded-full {
@@ -204,4 +175,46 @@ input[type="number"]::-webkit-outer-spin-button {
 /* Additional spacing class */
 .input-separation {
     margin-bottom: 1rem; /* Adjust this value to increase or decrease the spacing */
+}
+
+/* Positioning for the Connect Wallet button */
+.absolute {
+    position: absolute;
+}
+
+.top-0 {
+    top: 0;
+}
+
+.right-0 {
+    right: 0;
+}
+
+.m-4 {
+    margin: 1rem;
+}
+
+/* Styling for Connect Wallet button */
+.connect-wallet-button {
+    background-color: #38a169; /* Green */
+    color: white; /* White text */
+    padding: 1rem 3rem; /* Adjust padding for button */
+    border-radius: 9999px; /* Rounded button */
+    border: none; /* Remove default border */
+    font-size: 1.2rem; /* Button text size */
+    font-weight: 600; /* Bold text */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+    margin-top: 40px;
+    margin-right: 30px;
+}
+
+.connect-wallet-button:hover {
+    background-color: #2f855a; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly larger on hover */
+}
+
+.connect-wallet-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.5); /* Focus ring */
 }

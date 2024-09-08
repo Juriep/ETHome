@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import "./UserRegistration.css"; // Import the CSS file for styles
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { connectWallet, disconnectWallet, checkWalletConnection } from './WalletConnectionUtils'; // Import connection functions
 
 const UserRegistration = () => {
   const canvasRef = useRef(null); // Reference to the canvas element
   const [username, setUsername] = useState(""); // State for username input
   const [age, setAge] = useState(""); // State for age input
+  const [account, setAccount] = useState(null); // State for wallet address
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
 
   // Initialize stars and animation on component mount
@@ -73,6 +75,26 @@ const UserRegistration = () => {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
+  // Check wallet connection on component mount
+  useEffect(() => {
+    checkWalletConnection(setAccount, handleAccountChange);
+  }, []);
+
+  // Handle account change
+  const handleAccountChange = (newAccount) => {
+    setAccount(newAccount);
+  };
+
+  // Handle wallet connection
+  const handleConnect = async () => {
+    await connectWallet(setAccount, handleAccountChange);
+  };
+
+  // Handle wallet disconnection
+  const handleDisconnect = async () => {
+    await disconnectWallet(setAccount, handleAccountChange);
+  };
+
   // Handle registration and navigation
   const handleRegisterClick = () => {
     if (!username || !age) {
@@ -127,6 +149,29 @@ const UserRegistration = () => {
         >
           Register
         </motion.button>
+
+        {/* Connect Wallet Button */}
+        <div className="absolute top-0 right-0 m-4">
+          {account ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="connect-wallet-button"
+              onClick={handleDisconnect}
+            >
+              {account.slice(0, 6)}...{account.slice(-4)} {/* Abbreviated address */}
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="connect-wallet-button"
+              onClick={handleConnect}
+            >
+              Connect Wallet
+            </motion.button>
+          )}
+        </div>
       </div>
     </div>
   );
